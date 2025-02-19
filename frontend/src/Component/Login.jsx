@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import "../Style/LogReg.css";
 
 function Login({ setUser }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -26,11 +27,16 @@ function Login({ setUser }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-      <input type="password" name="password" placeholder="Passwort" onChange={handleChange} required />
-      <button type="submit">Login</button>
-    </form>
+    <div className="log-reg">
+      <div className="log-block">
+        <form onSubmit={handleSubmit}>
+        <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
+        <input type="password" name="password" placeholder="password" onChange={handleChange} required />
+        <button className="button" type="submit">Login</button>
+        <p>Don't have an account yet? <a href="/register">Sign up here</a>.</p>
+      </form>
+      </div>
+    </div>
   );
 }
 

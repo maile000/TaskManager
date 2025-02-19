@@ -1,0 +1,36 @@
+.log-reg{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    width: 100vw;
+    background-image: url("../Assets/black.jpg");
+}
+
+.log-block{
+    display: flex;
+    flex-direction: row;
+    width: 250px;
+    height: 200px;
+    background: rgba(128, 128, 128, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    border-radius: 15px;
+    padding: 30px;
+    align-items: center;
+    justify-content: center;
+}
+
+.log-block form{
+    display: flex;
+    flex-direction: column;
+}
+
+.log-block input{
+    margin: 15px;
+    padding: 5px;
+    border-radius: 5px;
+    width: 75%;
+}

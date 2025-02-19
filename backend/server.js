@@ -1,6 +1,13 @@
 require("dotenv").config();
 const express = require("express");
 const bcrypt = require("bcryptjs");
+const crypto = require("crypto");
+
+// Setzt eine alternative Zufallsquelle für bcryptjs
+bcrypt.setRandomFallback((len) => {
+  return crypto.randomBytes(len);
+});
+
 const jwt = require("jsonwebtoken");
 const cors = require("cors");
 const pool = require("./db");
@@ -16,26 +23,33 @@ app.post("/register", async (req, res) => {
   const { name, email, password } = req.body;
 
   try {
-    // Prüfen, ob die E-Mail bereits existiert
-    const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
-    if (userExists.rows.length > 0) return res.status(400).json({ error: "E-Mail existiert bereits" });
+    console.log("📌 Registrierungsversuch:", req.body);
 
-    // Passwort hashen
+    const userExists = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
+    if (userExists.rows.length > 0) {
+      console.log("⚠️ Email existiert bereits!");
+      return res.status(400).json({ error: "E-Mail existiert bereits" });
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
+    console.log("🔑 Passwort gehasht!");
 
-    // Neuen User in die DB einfügen
     const newUser = await pool.query(
       "INSERT INTO users (name, email, password_hash) VALUES ($1, $2, $3) RETURNING *",
       [name, email, hashedPassword]
     );
 
+    console.log("✅ Registrierung erfolgreich!", newUser.rows[0]);
     res.json(newUser.rows[0]);
+
   } catch (err) {
-    console.error(err);
-    res.status(500).send("Server-Fehler");
+    console.error("❌ Fehler in /register:", err.message);  // Gibt genauere Infos aus
+    res.status(500).json({ error: "Interner Serverfehler", details: err.message });
   }
 });
+
+
 
 // Login mit JWT-Token
 app.post("/login", async (req, res) => {

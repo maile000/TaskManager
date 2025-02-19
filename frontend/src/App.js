@@ -1,16 +1,20 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import { useState, useEffect } from "react";
+import "./App.css";
 import Login from "./Component/Login";
 import Register from "./Component/Register";
+import Navbar from "./Component/Nav";  // ⬅️ Navbar importieren
 
 function App() {
     const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true); // Verhindert Flackern beim Laden
 
     useEffect(() => {
         const token = localStorage.getItem("token");
         if (token) {
             setUser(true);
         }
+        setLoading(false); // Sobald überprüft, setzen wir loading auf false
     }, []);
 
     const handleLogout = () => {
@@ -18,35 +22,34 @@ function App() {
         setUser(false);
     };
 
+    if (loading) {
+        return <h1>Loading...</h1>; // Verhindert Flackern beim Laden
+    }
+
     return (
         <Router>
-            <nav>
-                {user ? (
-                    <button onClick={handleLogout}>Logout</button>
-                ) : (
-                    <>
-                        <a href="/">Login</a>
-                        <a href="/register">Registrieren</a>
-                    </>
-                )}
-            </nav>
-
+            <Navbar user={user} onLogout={handleLogout} />  {/* Navbar hier eingefügt */}
             <Routes>
-                <Route path="/" element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} />
-                <Route path="/register" element={<Register setUser={setUser} />} />
-                <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/" />} />
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} />
+                <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register setUser={setUser} />} />
+                <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+                <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
             </Routes>
         </Router>
     );
 }
 
+function Home() {
+    return <h1>🏠 Willkommen auf der Startseite</h1>;
+}
+
 function Dashboard() {
-    return (
-        <div>
-            <h1>Willkommen im Dashboard! 🎉</h1>
-            <p>Hier siehst du deine Teams und Aufgaben.</p>
-        </div>
-    );
+    return <h1>📋 Willkommen im Board!</h1>;
+}
+
+function Profile() {
+    return <h1> Dein Profil</h1>;
 }
 
 export default App;
