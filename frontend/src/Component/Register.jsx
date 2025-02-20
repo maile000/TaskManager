@@ -1,7 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import "../Style/LogReg.css";
+import "./Style/LogReg.css";
 
 function Register({ setUser }) {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -43,6 +43,7 @@ function Register({ setUser }) {
           <input type="password" name="password" placeholder="Passwort" onChange={handleChange} required />
           <button className="button" type="submit">Registrieren</button>
         </form>
+        <p>You have an account? <a href="/login">Login here</a>.</p>
       </div>
     </div>
    

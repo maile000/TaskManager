@@ -3,7 +3,10 @@ import { useState, useEffect } from "react";
 import "./App.css";
 import Login from "./Component/Login";
 import Register from "./Component/Register";
-import Navbar from "./Component/Nav";  // ⬅️ Navbar importieren
+import Navbar from "./Component/Nav";
+import Landing from "./Pages/Landing";
+import Board from "./Pages/Board";
+import Home from "./Pages/Home";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -30,23 +33,17 @@ function App() {
         <Router>
             <Navbar user={user} onLogout={handleLogout} />  {/* Navbar hier eingefügt */}
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={user ? <Home/> : <Landing />} />
                 <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} />
                 <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register setUser={setUser} />} />
-                <Route path="/dashboard" element={user ? <Dashboard /> : <Navigate to="/login" />} />
+                <Route path="/dashboard" element={user ? <Board /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
             </Routes>
         </Router>
     );
 }
 
-function Home() {
-    return <h1>🏠 Willkommen auf der Startseite</h1>;
-}
 
-function Dashboard() {
-    return <h1>📋 Willkommen im Board!</h1>;
-}
 
 function Profile() {
     return <h1> Dein Profil</h1>;

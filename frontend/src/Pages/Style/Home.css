@@ -1,0 +1,49 @@
+.home-background{
+    background: linear-gradient(to bottom ,#977DFF, #00033D);
+    height: 100vh;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} 
+
+.home-grid{
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(2, auto);
+    gap: 30px;
+    height: 80vh;
+    width: 90vw;
+}
+
+.item{
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.item1{
+    grid-column: span 2;
+    grid-row: span 2;
+    background-color: #FFCCF2;
+    
+}
+
+.item2{
+    background: #00033D;
+}
+
+.item3{
+    background: #00033D;
+}
+
+@media (max-width: 600px) {
+    .home-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto;
+    }
+
+    .item1, .item2, .item3 {
+        grid-column: span 1;
+        grid-row: auto;
+    }
+}

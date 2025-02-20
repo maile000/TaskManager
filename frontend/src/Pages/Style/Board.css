@@ -1,0 +1,15 @@
+.board-background{
+    background: linear-gradient(to bottom ,#977DFF, #00033D);
+    height: 100vh;
+    width: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+} 
+
+.board-box{
+    background: #00033D;
+    width: 90vw;
+    height: 80vh;
+    border-radius: 15px;
+}

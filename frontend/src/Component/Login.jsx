@@ -1,6 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
-import "../Style/LogReg.css";
+import "./Style/LogReg.css";
 
 function Login({ setUser }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
