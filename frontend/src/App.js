@@ -7,6 +7,8 @@ import Navbar from "./Component/Nav";
 import Landing from "./Pages/Landing";
 import Board from "./Pages/Board";
 import Home from "./Pages/Home";
+import Team from "./Pages/Team";
+import TeamPage from "./Pages/TeamPages";
 
 function App() {
     const [user, setUser] = useState(null);
@@ -36,8 +38,10 @@ function App() {
                 <Route path="/" element={user ? <Home/> : <Landing />} />
                 <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} />
                 <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register setUser={setUser} />} />
-                <Route path="/dashboard" element={user ? <Board /> : <Navigate to="/login" />} />
+                <Route path="/team/:teamId/dashboard" element={user ? <Board /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+                <Route path="/team/:teamId" element={user ? <TeamPage />: <Navigate to="/login" />} />
+                <Route path="/team" element={user ? <Team />: <Navigate to="/login" />} />
             </Routes>
         </Router>
     );

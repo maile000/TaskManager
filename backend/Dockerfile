@@ -1,17 +1,18 @@
-# Basis-Image für Node.js
+# Wähle das Node-Image
 FROM node:18
 
-# Arbeitsverzeichnis setzen
+# Erstelle ein Arbeitsverzeichnis
 WORKDIR /app
 
-# Package.json und package-lock.json kopieren
+# Kopiere die package.json und installiere die Abhängigkeiten
 COPY package*.json ./
-
-# Abhängigkeiten installieren
 RUN npm install
 
-# Restliche Dateien kopieren
+# Kopiere den Rest der Anwendung
 COPY . .
 
-# Standardbefehl
-CMD ["node", "index.js"]
+# Exponiere den Port
+EXPOSE 5000
+
+# Starte den Server
+CMD ["node", "server.js"]

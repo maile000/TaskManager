@@ -1,6 +1,9 @@
 import "./Style/Home.css";
+import React from "react";
 
 function Home () {
+
+
 
     return(
         <div className="home-background">
@@ -9,6 +12,7 @@ function Home () {
                 <div className="item item2">2</div>
                 <div className="item item3">3</div>
             </div>
+            
         </div>
     )
 };

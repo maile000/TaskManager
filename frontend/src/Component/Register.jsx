@@ -15,38 +15,80 @@ function Register({ setUser }) {
     e.preventDefault();
 
     try {
-        const res = await axios.post("http://localhost:5000/register", formData);
+      // Registrierungsanfrage senden
+      const res = await axios.post("http://localhost:5000/register", formData);
 
-        if (res && res.data) {
-            alert("✅ Erfolgreich registriert! Jetzt einloggen.");
+      if (res && res.data) {
+        console.log("✅ Erfolgreich registriert:", res.data);
+
+        // Automatisch einloggen nach erfolgreicher Registrierung
+        const loginRes = await axios.post("http://localhost:5000/login", {
+          email: formData.email,
+          password: formData.password,
+        });
+
+        if (loginRes && loginRes.data && loginRes.data.token && loginRes.data.user) {
+          // Token und Benutzerdaten im LocalStorage speichern
+          localStorage.setItem("token", loginRes.data.token);
+          localStorage.setItem("user", JSON.stringify(loginRes.data.user));
+
+          // Benutzerzustand aktualisieren
+          setUser(loginRes.data.user);
+
+          // Zur Startseite navigieren
+          navigate("/");
+          console.log("🔑 Automatisch eingeloggt:", loginRes.data.user);
         } else {
-            throw new Error("Ungültige Serverantwort");
+          throw new Error("Automatischer Login fehlgeschlagen");
         }
+      } else {
+        throw new Error("Ungültige Serverantwort");
+      }
     } catch (error) {
-        console.error("❌ Registrierungs-Fehler:", error);
+      console.error("❌ Registrierungs-Fehler:", error);
 
-        if (error.response) {
-            console.error("📌 Fehlerdetails:", error.response.data);
-            alert(error.response.data.error || "Fehler bei der Registrierung.");
-        } else {
-            alert("❌ Netzwerkfehler oder Server nicht erreichbar.");
-        }
+      if (error.response) {
+        console.error("📌 Fehlerdetails:", error.response.data);
+      } else {
+        console.error("❌ Netzwerkfehler oder Server nicht erreichbar.");
+      }
     }
-};
+  };
 
   return (
     <div className="log-reg">
       <div className="log-block">
         <form onSubmit={handleSubmit}>
-          <input type="text" name="name" placeholder="Username" onChange={handleChange} required />
-          <input type="email" name="email" placeholder="Email" onChange={handleChange} required />
-          <input type="password" name="password" placeholder="Passwort" onChange={handleChange} required />
-          <button className="button" type="submit">Registrieren</button>
+          <input
+            type="text"
+            name="name"
+            placeholder="Username"
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="email"
+            name="email"
+            placeholder="Email"
+            onChange={handleChange}
+            required
+          />
+          <input
+            type="password"
+            name="password"
+            placeholder="Passwort"
+            onChange={handleChange}
+            required
+          />
+          <button className="button" type="submit">
+            Registrieren
+          </button>
         </form>
-        <p>You have an account? <a href="/login">Login here</a>.</p>
+        <p>
+          You have an account? <a href="/login">Login here</a>.
+        </p>
       </div>
     </div>
-   
   );
 }
 

@@ -6,8 +6,8 @@ function Nav({ user, onLogout }) {
             <Link to="/" style={styles.link}>Home</Link>
             {user ? (
                 <>
-                    <Link to="/dashboard" style={styles.link}>Board</Link>
                     <Link to="/profile" style={styles.link}>Profil</Link>
+                    <Link to="/team" style={styles.link}>Team</Link>
                     <button onClick={onLogout} style={styles.button}>Logout</button>
                 </>
             ) : (
