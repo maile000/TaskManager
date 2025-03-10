@@ -1,0 +1,25 @@
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.modalContent {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 15px;
+    width: 300px;
+    text-align: center;
+}
+
+.inviteCode {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: #007bff;
+}

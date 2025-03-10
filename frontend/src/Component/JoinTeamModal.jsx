@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./StyleComp/Modal.css";
 
 const JoinTeamModal = ({ onClose, onJoin }) => {
   const [inviteCode, setInviteCode] = useState("");
@@ -27,8 +28,8 @@ const JoinTeamModal = ({ onClose, onJoin }) => {
   };
 
   return (
-    <div style={styles.modalOverlay}>
-      <div style={styles.modalContent}>
+    <div className="modalOverlay">
+      <div className="modalContent">
         <h2>Team beitreten</h2>
         <input
           type="text"
@@ -36,32 +37,11 @@ const JoinTeamModal = ({ onClose, onJoin }) => {
           onChange={(e) => setInviteCode(e.target.value)}
           placeholder="Einladungscode eingeben"
         />
-        <button onClick={handleJoinTeam}>Beitreten</button>
-        <button onClick={onClose}>Abbrechen</button>
+        <button onClick={handleJoinTeam} className="button">Beitreten</button>
+        <button onClick={onClose} className="button" >Abbrechen</button>
       </div>
     </div>
   );
-};
-
-const styles = {
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "300px",
-    textAlign: "center",
-  },
 };
 
 export default JoinTeamModal;

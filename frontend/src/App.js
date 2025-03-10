@@ -5,7 +5,7 @@ import Login from "./Component/Login";
 import Register from "./Component/Register";
 import Navbar from "./Component/Nav";
 import Landing from "./Pages/Landing";
-import Board from "./Pages/Board";
+import Board from "./Component/Board";
 import Home from "./Pages/Home";
 import Team from "./Pages/Team";
 import TeamPage from "./Pages/TeamPages";

@@ -1,38 +1,59 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom"; // Für die Links zu den Team-Routen
+import { useNavigate } from "react-router-dom";
+import CreateTeamModal from "../Component/CreatTeamModal";
 
 const TeamList = ({ teams, setTeams }) => {
-  // teams und setTeams werden als Props übergeben, um die Liste zu aktualisieren
+  const navigate = useNavigate();
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const userId = JSON.parse(localStorage.getItem("user")).id;
 
   useEffect(() => {
     const fetchTeams = async () => {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get("http://localhost:5000/teams", {
+          params: { userId }, 
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
-        setTeams(response.data); 
+        setTeams(response.data);
       } catch (error) {
         console.error("Fehler beim Laden der Teams:", error);
       }
     };
 
     fetchTeams();
-  }, [setTeams]); 
+  }, [setTeams, userId]);
+
+  const handleCreateTeam = (newTeam) => {
+    setTeams([...teams, newTeam]);
+  };
 
   return (
     <div>
       <h2>Meine Teams</h2>
-      <ul>
+      <div className="teams-div">
         {teams.map((team) => (
-          <li key={team.id}>
-            <Link to={`/team/${team.id}`}>{team.name}</Link>
-          </li>
+          <div>
+            <div key={team.id} >
+              <button className="teams-block" onClick={() => navigate(`/team/${team.id}`)}>
+                {team.name}
+              </button>
+            </div>
+            
+          </div>
         ))}
-      </ul>
+        <button className="teams-block" onClick={() => setIsCreateModalOpen(true)}>+</button>
+        {isCreateModalOpen && (
+          <CreateTeamModal
+            onClose={() => setIsCreateModalOpen(false)}
+            onCreate={handleCreateTeam}
+          />
+        )}
+
+      </div>
     </div>
   );
 };

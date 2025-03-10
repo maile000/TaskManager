@@ -46,11 +46,23 @@
   color: #00033D;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   border-radius: 15px;
-  height: 35px;
+  height: 4%;
   margin: 15px;
+  padding: 15px;
+  border: none;
 }
 
 .button:hover{
   background-color: #00033D;
   color: #9747FF;
+}
+
+.column{
+  display: flex;
+  flex-direction: column;
+}
+
+.row{
+  display: flex;
+  flex-direction: row;
 }

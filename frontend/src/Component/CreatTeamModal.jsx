@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import "./StyleComp/Modal.css";
 
 const CreateTeamModal = ({ onClose, onCreate }) => {
   const [teamName, setTeamName] = useState("");
@@ -20,15 +21,15 @@ const CreateTeamModal = ({ onClose, onCreate }) => {
         }
       );
       onCreate(response.data); // Team an die Elternkomponente übergeben
-      onClose(); // Modal schließen
+      onClose();
     } catch (error) {
       console.error("Fehler beim Erstellen des Teams:", error);
     }
   };
 
   return (
-    <div style={styles.modalOverlay}>
-      <div style={styles.modalContent}>
+    <div className="modalOverlay">
+      <div className="modalContent">
         <h2>Team erstellen</h2>
         <form onSubmit={handleSubmit}>
           <input
@@ -38,34 +39,14 @@ const CreateTeamModal = ({ onClose, onCreate }) => {
             placeholder="Teamname"
             required
           />
-          <button type="submit">Erstellen</button>
-          <button type="button" onClick={onClose}>
+          <button type="submit" className="button">Erstellen</button>
+          <button type="button" onClick={onClose} className="button">
             Abbrechen
           </button>
         </form>
       </div>
     </div>
   );
-};
-
-const styles = {
-  modalOverlay: {
-    position: "fixed",
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-    display: "flex",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    padding: "20px",
-    borderRadius: "8px",
-    width: "300px",
-  },
 };
 
 export default CreateTeamModal;

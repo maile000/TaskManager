@@ -148,14 +148,24 @@ app.get("/teams", authenticate, async (req, res) => {
 // Details eines spezifischen Teams abrufen
 app.get("/teams/:teamId", authenticate, async (req, res) => {
   const { teamId } = req.params;
-
   try {
+    // Überprüfen, ob der Benutzer Mitglied des Teams ist
+    const memberCheck = await pool.query(
+      "SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2",
+      [req.userId, teamId]
+    );
+    if (memberCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Du bist kein Mitglied dieses Teams" });
+    }
+
+    // Team-Details abrufen
     const team = await pool.query("SELECT * FROM teams WHERE id = $1", [teamId]);
     if (team.rows.length === 0) {
       return res.status(404).json({ error: "Team nicht gefunden" });
     }
     res.json(team.rows[0]);
   } catch (err) {
+    console.error("Fehler beim Abrufen des Teams:", err);
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 });

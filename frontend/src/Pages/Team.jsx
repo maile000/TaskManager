@@ -2,15 +2,15 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import CreateTeamModal from "../Component/CreatTeamModal";
 import TeamList from "../Component/TeamList";
-import JoinTeamModal from "../Component/JoinTeamModal"; // Neue Komponente für das Beitreten
+import JoinTeamModal from "../Component/JoinTeamModal";
+import "./Style/Team.css";
 
 function Team() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [isJoinModalOpen, setIsJoinModalOpen] = useState(false);
   const [teams, setTeams] = useState([]);
-  const userId = JSON.parse(localStorage.getItem("user")).id; // Benutzer-ID aus dem LocalStorage
+  const userId = JSON.parse(localStorage.getItem("user")).id;
 
-  // Teams laden
   useEffect(() => {
     const fetchTeams = async () => {
       try {
@@ -35,29 +35,34 @@ function Team() {
   };
 
   return (
-    <div>
-      <h1>Team Management</h1>
-      <button onClick={() => setIsCreateModalOpen(true)}>Team erstellen</button>
-      <button onClick={() => setIsJoinModalOpen(true)}>Team beitreten</button>
+    <div className="team-managment-page">
+      <div style={{margin:"80px"}}>
+        <div className="column team-managment-div">
+          <h1>Team Management</h1>
+          <div className="row">
+            <button className="button" onClick={() => setIsCreateModalOpen(true)}>Team erstellen</button>
+            <button className="button" onClick={() => setIsJoinModalOpen(true)}>Team beitreten</button>
+          </div>
+        </div>
+        <TeamList teams={teams} setTeams={setTeams} />
 
-      <TeamList teams={teams} setTeams={setTeams} />
+        {isCreateModalOpen && (
+          <CreateTeamModal
+            onClose={() => setIsCreateModalOpen(false)}
+            onCreate={handleCreateTeam}
+          />
+        )}
 
-      {isCreateModalOpen && (
-        <CreateTeamModal
-          onClose={() => setIsCreateModalOpen(false)}
-          onCreate={handleCreateTeam}
-        />
-      )}
-
-      {isJoinModalOpen && (
-        <JoinTeamModal
-          onClose={() => setIsJoinModalOpen(false)}
-          onJoin={() => {
-            setIsJoinModalOpen(false);
-            
-          }}
-        />
-      )}
+        {isJoinModalOpen && (
+          <JoinTeamModal
+            onClose={() => setIsJoinModalOpen(false)}
+            onJoin={() => {
+              setIsJoinModalOpen(false);
+              
+            }}
+          />
+        )}
+      </div>
     </div>
   );
 }

@@ -1,0 +1,43 @@
+.team-managment-page{
+    display: flex;
+    flex-direction: column;
+    background: url('../../Assets/glas.jpg') no-repeat center center fixed;
+    background-size: cover;
+    min-height: 100vh;
+    color: #9747FF;
+}
+
+.team-managment-div{
+    background-color: rgba(54, 53, 53, 0.5);
+    padding: 15px;
+    border-radius: 15px;
+}
+
+.teams-div{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.teams-block{
+    width: 150px;
+    height: 150px;
+    margin: 30px;
+    border-radius: 15px;
+    background: rgba(0, 3, 61, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: larger;
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #0033FF;
+    font-weight: 1000;
+}
+
+.teams-block:hover{
+    transform: rotateY(10deg) scale(1.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.4);
+}
