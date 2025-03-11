@@ -28,7 +28,7 @@ CREATE TABLE tasks (
     team_id INT REFERENCES teams(id) ON DELETE CASCADE,
     title VARCHAR(255) NOT NULL,
     description TEXT,
-    status VARCHAR(50) CHECK (status IN ('To Do', 'Planning', 'In Progress', 'Done')) NOT NULL DEFAULT 'Planning',
+    status VARCHAR(50) CHECK (status IN ('To Do', 'Planning', 'In Progress', 'Done', 'Archiv')) NOT NULL DEFAULT 'Planning',
     points INTEGER DEFAULT 10,
     assigned_to INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW(),

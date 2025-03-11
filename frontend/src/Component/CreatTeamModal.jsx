@@ -9,7 +9,7 @@ const CreateTeamModal = ({ onClose, onCreate }) => {
     e.preventDefault();
     try {
       const token = localStorage.getItem("token");
-      const userId = JSON.parse(localStorage.getItem("user")).id; // Benutzer-ID aus dem LocalStorage
+      const userId = JSON.parse(localStorage.getItem("user")).id;
 
       const response = await axios.post(
         "http://localhost:5000/create-team",
@@ -20,7 +20,7 @@ const CreateTeamModal = ({ onClose, onCreate }) => {
           },
         }
       );
-      onCreate(response.data); // Team an die Elternkomponente übergeben
+      onCreate(response.data);
       onClose();
     } catch (error) {
       console.error("Fehler beim Erstellen des Teams:", error);

@@ -12,27 +12,34 @@ function TeamPage() {
 
   // Team-Details laden
   useEffect(() => {
-    const fetchTeam = async () => {
+    const fetchTeamData = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/teams/${teamId}`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+  
+        // Erster Aufruf: Team-Daten
+        const teamResponse = await axios.get(`http://localhost:5000/teams/${teamId}`, {
+          headers: { Authorization: `Bearer ${token}` },
         });
-        setTeam(response.data);
+  
+        // Zweiter Aufruf: Team-Mitglieder
+        const membersResponse = await axios.get(`http://localhost:5000/teams/${teamId}/members`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+  
+        // Zusammenführen der Daten
+        setTeam({ ...teamResponse.data, members: membersResponse.data });
       } catch (error) {
         console.error("Fehler beim Laden des Teams:", error);
       }
     };
-
-    fetchTeam();
+  
+    fetchTeamData();
   }, [teamId]);
-
+  
   if (!team) {
     return <div>Lade Team...</div>;
   }
-
+  
   return (
     <div className="teampage">
       <Sidebar/>

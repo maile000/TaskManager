@@ -3,13 +3,17 @@
     height: 100vh;
     width: auto;
     display: flex;
-    justify-content: center;
+    justify-content: flex-end;
     align-items: center;
 } 
 
 .board-box{
     background: #00033D;
-    width: 90vw;
+    width: 85vw;
     height: 80vh;
+    display: flex;
+    justify-content: space-around;
     border-radius: 15px;
+    margin: 0 30px 30px 75px;
+    color: white;
 }

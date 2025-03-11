@@ -31,8 +31,8 @@ function Team() {
   }, [userId]);
 
   const handleCreateTeam = (newTeam) => {
-    setTeams([...teams, newTeam]); // Neues Team zur Liste hinzufügen
-  };
+    setTeams([...teams, newTeam]);
+  }
 
   return (
     <div className="team-managment-page">
@@ -57,8 +57,7 @@ function Team() {
           <JoinTeamModal
             onClose={() => setIsJoinModalOpen(false)}
             onJoin={() => {
-              setIsJoinModalOpen(false);
-              
+              setIsJoinModalOpen(false);              
             }}
           />
         )}

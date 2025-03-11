@@ -317,7 +317,7 @@ app.get("/teams/:teamId/tasks", authenticate, async (req, res) => {
 app.put("/tasks/:taskId/status", authenticate, async (req, res) => {
   const { taskId } = req.params;
   const { newStatus } = req.body;
-  const validStatuses = ["To Do", "Planning", "In Progress", "Done"];
+  const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archiv"];
 
   if (!validStatuses.includes(newStatus)) {
     return res.status(400).json({ error: "Ungültiger Status" });
