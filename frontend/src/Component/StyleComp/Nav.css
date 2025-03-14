@@ -8,6 +8,8 @@
     align-items: center;
     z-index: 100;
     position: sticky;
+    top: 0;
+    overflow: auto;
 }
 .navbar-link {
     color: white;

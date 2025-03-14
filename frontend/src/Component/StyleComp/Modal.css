@@ -18,8 +18,36 @@
     text-align: center;
 }
 
+.modalForm{
+    display: flex;
+    flex-direction: column;
+}
+
 .inviteCode {
     font-weight: bold;
     font-size: 1.2em;
     color: #007bff;
+}
+
+.modalClose{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-end;
+    align-items: flex-start;
+}
+
+.close-btn {
+    width: 40px;
+    height: 40px;
+    background-color: #9747FF;
+    -webkit-mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><line x1="10" y1="10" x2="30" y2="30" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="10" y1="30" x2="30" y2="10" stroke="black" stroke-width="4" stroke-linecap="round"/></svg>');
+    mask-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40"><line x1="10" y1="10" x2="30" y2="30" stroke="black" stroke-width="4" stroke-linecap="round"/><line x1="10" y1="30" x2="30" y2="10" stroke="black" stroke-width="4" stroke-linecap="round"/></svg>');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    cursor: pointer;
+}
+
+.close-btn:hover {
+    background-color: #282c34;
 }

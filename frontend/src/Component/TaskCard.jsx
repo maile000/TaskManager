@@ -1,12 +1,14 @@
-// TaskCard.jsx
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import axios from "axios";
+import { useParams } from "react-router-dom";
 
 function TaskCard({ task }) {
   const [expanded, setExpanded] = useState(false);
-  // Verwenden Sie useSortable, um die TaskCard dragbar zu machen.
-  // Die ID wird als "task-<id>" gesetzt, um Kollisionen mit Column-IDs zu vermeiden.
+  const { teamId } = useParams();
+  const [taskDetails, setTaskDetails] = useState(task);
+  
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
     id: `task-${task.id}`,
   });
@@ -22,11 +24,39 @@ function TaskCard({ task }) {
     cursor: "grab",
   };
 
+  useEffect(() => {
+    const fetchTask = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:5000/teams/${teamId}/tasks`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        console.log("Geladene Tasks:", response.data); // Debugging
+        setTaskDetails(response.data);
+      } catch (error) {
+        console.error("Fehler beim Laden der Tasks:", error);
+      }
+    };
+    if (taskDetails) {
+      fetchTask();
+    }
+  }, [taskDetails]);
+  
+
   return (
-    <div ref={setNodeRef} style={style} {...listeners} {...attributes}>
-      {/* Klickbarer Header zum Auf- und Zuklappen */}
+    <div ref={setNodeRef} style={style} >
+     <div {...listeners} {...attributes} style={{ cursor: "grab", padding: "4px" }}>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="6" cy="10" r="1"></circle>
+          <circle cx="6" cy="14" r="1"></circle>
+          <circle cx="12" cy="10" r="1"></circle>
+          <circle cx="12" cy="14" r="1"></circle>
+          <circle cx="18" cy="10" r="1"></circle>
+          <circle cx="18" cy="14" r="1"></circle>
+        </svg>
+      </div>
       <div onClick={() => setExpanded(!expanded)} style={{ userSelect: "none" }}>
-        <strong>{task.title}</strong>
+        <strong style={{color:"red"}}>{task.title}</strong>
       </div>
       {expanded && (
         <div style={{ marginTop: "8px" }}>

@@ -239,6 +239,43 @@ app.post("/teams/:teamId/tasks", authenticate, async (req, res) => {
   }
 });
 
+// drag and drop position
+app.put("/tasks/:taskId/position", async (req, res) => {
+  const { newStatus, newPosition } = req.body;
+  const { taskId } = req.params;
+
+  try {
+    await db.query(
+      "UPDATE tasks SET status = $1, position = $2 WHERE id = $3",
+      [newStatus, newPosition, taskId]
+    );
+
+    res.json({ message: "Task position updated successfully" });
+  } catch (error) {
+    console.error("Error updating task position:", error);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+//cloumn oder
+app.put("/teams/:teamId/column-order", async (req, res) => {
+  const { columnOrder } = req.body;
+  const { teamId } = req.params;
+
+  try {
+    await pool.query("UPDATE teams SET column_order = $1 WHERE id = $2", [
+      JSON.stringify(columnOrder),
+      teamId,
+    ]);
+
+    res.json({ message: "Column order updated successfully" });
+  } catch (error) {
+    console.error("Error updating column order:", error);
+    res.status(500).json({ error: "Database error" });
+  }
+});
+
+
 // Rolle eines Teammitglieds ändern
 app.put("/teams/:teamId/members/:userId/role", authenticate, async (req, res) => {
   const { teamId, userId } = req.params;

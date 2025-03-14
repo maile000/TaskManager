@@ -1,4 +1,3 @@
-// Board.jsx
 import React, { useState, useEffect } from "react";
 import "./Style/Board.css";
 import Sidebar from "../Component/SideBar";
@@ -15,10 +14,8 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import TaskCard from "../Component/TaskCard";
 
-// Definieren Sie die verfügbaren Status als Ausgangsreihenfolge der Columns.
 const statuses = ["To Do", "Planning", "In Progress", "Done"];
 
-// Column-Komponente rendert alle TaskCards für einen bestimmten Status.
 function Column({ status, tasks }) {
   const style = {
     padding: "16px",
@@ -75,6 +72,8 @@ function Board() {
           headers: { Authorization: `Bearer ${token}` },
         });
         setTasks(response.data);
+        console.log("Geladene Tasks:", response.data);
+console.log("Tasks nach Status gruppiert:", tasksByStatus);
       } catch (error) {
         console.error("Fehler beim Laden der Tasks:", error);
       }
@@ -94,27 +93,34 @@ function Board() {
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over) return;
-
+  
     if (columnOrder.includes(active.id)) {
-      // Column drag
       if (active.id !== over.id) {
         const oldIndex = columnOrder.indexOf(active.id);
         const newIndex = columnOrder.indexOf(over.id);
         const newOrder = arrayMove(columnOrder, oldIndex, newIndex);
         setColumnOrder(newOrder);
+  
+        try {
+          const token = localStorage.getItem("token");
+          await axios.put(
+            `http://localhost:5000/teams/${teamId}/column-order`,
+            { columnOrder: newOrder },
+            { headers: { Authorization: `Bearer ${token}` } }
+          );
+        } catch (error) {
+          console.error("Fehler beim Aktualisieren der Spaltenreihenfolge:", error);
+        }
       }
     } else {
-      // Task drag (IDs sind im Format "task-<id>")
       const activeTaskId = active.id.replace("task-", "");
-      const newStatus = over.id; // Erwartet wird, dass das Ziel die Column-ID (Status) ist.
+      const newStatus = over.id;
       if (newStatus && activeTaskId) {
-        const updatedTasks = tasks.map((task) => {
-          if (task.id.toString() === activeTaskId) {
-            return { ...task, status: newStatus };
-          }
-          return task;
-        });
+        const updatedTasks = tasks.map((task) =>
+          task.id.toString() === activeTaskId ? { ...task, status: newStatus } : task
+        );
         setTasks(updatedTasks);
+  
         try {
           const token = localStorage.getItem("token");
           await axios.put(
@@ -126,10 +132,9 @@ function Board() {
           console.error("Fehler beim Aktualisieren des Task-Status:", error);
         }
       }
-    }
+    }  
   };
 
-  // Gruppieren Sie die Tasks nach Status gemäß der aktuellen Spaltenreihenfolge.
   const tasksByStatus = columnOrder.reduce((acc, status) => {
     acc[status] = tasks.filter((task) => task.status === status);
     return acc;
@@ -139,11 +144,13 @@ function Board() {
     <div className="board-background">
       <Sidebar defaultOpen={false} />
       <div>
-        <button onClick={() => setCreateTaskOpen(true)} className="button">
+        <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
           Task erstellen
         </button>
         {isCreateTaskOpen && (
-          <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
+          <AddTask 
+          onClose={() => setCreateTaskOpen(false)} 
+          onCreate={handleCreateTask} />
         )}
         <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
           <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>

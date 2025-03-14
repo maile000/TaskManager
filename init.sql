@@ -12,7 +12,8 @@ CREATE TABLE teams (
     name VARCHAR(100) NOT NULL,
     invite_code VARCHAR(10) UNIQUE NOT NULL,
     total_team_points INTEGER DEFAULT 0,
-    created_at TIMESTAMP DEFAULT NOW()
+    created_at TIMESTAMP DEFAULT NOW(),
+    column_order TEXT NOT NULL DEFAULT '["To Do", "Planning", "In Progress", "Done"]'
 );
 
 CREATE TABLE team_members (
@@ -30,6 +31,7 @@ CREATE TABLE tasks (
     description TEXT,
     status VARCHAR(50) CHECK (status IN ('To Do', 'Planning', 'In Progress', 'Done', 'Archiv')) NOT NULL DEFAULT 'Planning',
     points INTEGER DEFAULT 10,
+    position INTEGER NOT NULL DEFAULT 0,
     assigned_to INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW(),
     deadline TIMESTAMP

@@ -30,6 +30,9 @@ const JoinTeamModal = ({ onClose, onJoin }) => {
   return (
     <div className="modalOverlay">
       <div className="modalContent">
+        <div className="modalClose">      
+          <button onClick={onClose} className="close-btn"></button>
+        </div>
         <h2>Team beitreten</h2>
         <input
           type="text"
