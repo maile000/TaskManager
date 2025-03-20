@@ -21,7 +21,7 @@ const JoinTeamModal = ({ onClose, onJoin }) => {
       );
 
       console.log("Team beigetreten:", response.data);
-      onJoin(); // Schließe das Modal und aktualisiere die Teams
+      onJoin();
     } catch (error) {
       console.error("Fehler beim Beitreten zum Team:", error);
     }

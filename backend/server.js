@@ -343,48 +343,123 @@ app.get("/teams/:teamId/tasks", authenticate, async (req, res) => {
       [teamId]
     );
 
-    res.json(tasks.rows);
+    return res.json(tasks.rows);
   } catch (err) {
     console.error("❌ Fehler beim Abrufen der Tasks:", err);
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 });
 
-// Task-Status aktualisieren
-app.put("/tasks/:taskId/status", authenticate, async (req, res) => {
-  const { taskId } = req.params;
-  const { newStatus } = req.body;
+// Einzelne Task abrufen
+app.get("/teams/:teamId/tasks/:taskId", authenticate, async (req, res) => {
+  const { teamId, taskId } = req.params;
+
+  try {
+    // Prüfen, ob der Benutzer Mitglied des Teams ist
+    const memberCheck = await pool.query(
+      "SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2",
+      [req.userId, teamId]
+    );
+
+    if (memberCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Du bist kein Mitglied dieses Teams" });
+    }
+
+    // Task abrufen
+    const task = await pool.query(
+      "SELECT * FROM tasks WHERE id = $1 AND team_id = $2",
+      [taskId, teamId]
+    );
+
+    if (task.rows.length === 0) {
+      return res.status(404).json({ error: "Task nicht gefunden" });
+    }
+
+    res.json(task.rows[0]);
+  } catch (err) {
+    console.error("❌ Fehler beim Abrufen der Task:", err);
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
+});
+
+// 🔹 Task aktualisieren mit `teamId` in der Route
+app.put("/teams/:teamId/tasks/:taskId", authenticate, async (req, res) => {
+  const { teamId, taskId } = req.params;
+  const { title, description, points, status, assigned_to } = req.body;
   const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archiv"];
 
-  if (!validStatuses.includes(newStatus)) {
-    return res.status(400).json({ error: "Ungültiger Status" });
+  // 🔹 Validierung: Status prüfen
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: "❌ Ungültiger Status: " + status });
   }
 
   try {
-    // Prüfen, ob die Task existiert und ob der Benutzer im Team ist
+    // 🔹 Prüfen, ob die Task in diesem Team existiert & der Benutzer Mitglied ist
     const taskCheck = await pool.query(
-      `SELECT t.*, tm.user_id FROM tasks t
+      `SELECT t.id FROM tasks t
+       JOIN team_members tm ON t.team_id = tm.team_id
+       WHERE t.id = $1 AND t.team_id = $2 AND tm.user_id = $3`,
+      [taskId, teamId, req.userId]
+    );
+
+    if (taskCheck.rows.length === 0) {
+      return res.status(403).json({ error: "🚫 Keine Berechtigung für diese Task oder falsches Team" });
+    }
+
+    // 🔹 Task-Daten aktualisieren
+    const updateQuery = `
+      UPDATE tasks 
+      SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5 
+      WHERE id = $6 AND team_id = $7
+      RETURNING *`;
+    
+    const updatedTask = await pool.query(updateQuery, [
+      title, description, points, status, assigned_to, taskId, teamId
+    ]);
+
+    res.json({ message: "✅ Task erfolgreich aktualisiert", task: updatedTask.rows[0] });
+  } catch (err) {
+    console.error("❌ Fehler beim Aktualisieren der Task:", err);
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
+});
+
+// Task-Status aktualisieren via Drag & Drop oder manuel
+app.put("/tasks/:taskId/status", authenticate, async (req, res) => {
+  const { taskId } = req.params;
+  const { status } = req.body; // ✅ Fix: S'assurer que Frontend envoie bien `status`
+  const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archiv"];
+
+  if (!validStatuses.includes(status)) {
+    return res.status(400).json({ error: "❌ Ungültiger Status: " + status });
+  }
+
+  try {
+    // ✅ Vérifier si l'utilisateur appartient à l'équipe de la tâche
+    const taskCheck = await pool.query(
+      `SELECT t.id, t.team_id FROM tasks t
        JOIN team_members tm ON t.team_id = tm.team_id
        WHERE t.id = $1 AND tm.user_id = $2`,
       [taskId, req.userId]
     );
 
     if (taskCheck.rows.length === 0) {
-      return res.status(403).json({ error: "Du hast keine Berechtigung für diese Task" });
+      return res.status(403).json({ error: "🚫 Keine Berechtigung für diese Task" });
     }
 
-    // Task-Status aktualisieren
+    // ✅ Mise à jour du statut
     await pool.query(
       "UPDATE tasks SET status = $1 WHERE id = $2",
-      [newStatus, taskId]
+      [status, taskId]
     );
 
-    res.json({ message: "Task-Status erfolgreich geändert" });
+    res.json({ message: "✅ Task-Status erfolgreich geändert", newStatus: status });
   } catch (err) {
     console.error("❌ Fehler beim Ändern des Task-Status:", err);
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 });
+
 
 // Server starten
 const PORT = process.env.PORT || 5000;

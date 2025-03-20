@@ -50,6 +50,9 @@
   margin: 15px;
   padding: 15px;
   border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .button:hover{

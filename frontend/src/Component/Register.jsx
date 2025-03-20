@@ -2,6 +2,8 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./StyleComp/LogReg.css";
+import LogReg from "./../Assets/black.jpg";
+
 
 function Register({ setUser }) {
   const [formData, setFormData] = useState({ name: "", email: "", password: "" });
@@ -15,27 +17,21 @@ function Register({ setUser }) {
     e.preventDefault();
 
     try {
-      // Registrierungsanfrage senden
       const res = await axios.post("http://localhost:5000/register", formData);
 
       if (res && res.data) {
         console.log("✅ Erfolgreich registriert:", res.data);
-
-        // Automatisch einloggen nach erfolgreicher Registrierung
         const loginRes = await axios.post("http://localhost:5000/login", {
           email: formData.email,
           password: formData.password,
         });
 
         if (loginRes && loginRes.data && loginRes.data.token && loginRes.data.user) {
-          // Token und Benutzerdaten im LocalStorage speichern
           localStorage.setItem("token", loginRes.data.token);
           localStorage.setItem("user", JSON.stringify(loginRes.data.user));
 
-          // Benutzerzustand aktualisieren
           setUser(loginRes.data.user);
 
-          // Zur Startseite navigieren
           navigate("/");
           console.log("🔑 Automatisch eingeloggt:", loginRes.data.user);
         } else {
@@ -56,9 +52,9 @@ function Register({ setUser }) {
   };
 
   return (
-    <div className="log-reg">
-      <div className="log-block">
-        <form onSubmit={handleSubmit}>
+    <div className="log-reg" style={{ backgroundImage: `url(${LogReg})` }}>
+      <div className="log-block column">
+        <form onSubmit={handleSubmit} >
           <input
             type="text"
             name="name"

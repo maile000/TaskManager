@@ -14,43 +14,44 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import TaskCard from "../Component/TaskCard";
 
-const statuses = ["To Do", "Planning", "In Progress", "Done"];
+const statuses = [ "Planning","To Do", "In Progress", "Done"];
 
-function Column({ status, tasks }) {
-  const style = {
-    padding: "16px",
-    minHeight: "300px",
-    flex: 1,
-    margin: "8px",
-    border: "1px dashed #ccc",
-  };
-
+function Column({ tasks, refreshTaskList }) {
+  
   return (
-    <div style={style}>
-      <h3>{status}</h3>
+    <div className="column-style">
       {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} />
+        <TaskCard key={task.id} task={task} refreshTaskList={refreshTaskList} />
       ))}
     </div>
   );
 }
 
-// DraggableColumn macht die gesamte Spalte per Drag & Drop verschiebbar.
-function DraggableColumn({ status, tasks }) {
+function DraggableColumn({ status, tasks, refreshTaskList }) {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: status, // Die Column-ID entspricht dem Statusnamen.
+    id: status,
   });
 
   const style = {
     transform: transform ? CSS.Transform.toString(transform) : undefined,
     transition,
+    backgroundColor: "rgba(255, 255, 255, 0.2)",
+    backdropFilter: "blur(12px) saturate(180%)",
+    WebkitBackdropFilter: "blur(12px) saturate(180%)",
+    borderRadius: "15px",
     flex: 1,
     margin: "8px",
+    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
+    border: "1px solid rgba(255, 255, 255, 0.3)", 
   };
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <Column status={status} tasks={tasks} />
+    <div ref={setNodeRef} style={style}>
+      <div {...attributes} {...listeners} 
+        style={{ cursor: "grab", fontWeight: "bold", display:"flex", justifyContent:"center", alignItem:"center", fontSize:"24px" }}>
+        {status}
+      </div>
+      <Column status={status} tasks={tasks} refreshTaskList={refreshTaskList} />
     </div>
   );
 }
@@ -60,47 +61,43 @@ function Board() {
   const [isCreateTaskOpen, setCreateTaskOpen] = useState(false);
   const [tasks, setTasks] = useState([]);
   const [columnOrder, setColumnOrder] = useState(statuses);
-  const userId = JSON.parse(localStorage.getItem("user")).id;
+  const userId = JSON.parse(localStorage.getItem("user"))?.id;
 
-  // Laden der Tasks aus dem Backend.
-  useEffect(() => {
-    const fetchTask = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(`http://localhost:5000/teams/${teamId}/tasks`, {
-          params: { userId },
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setTasks(response.data);
-        console.log("Geladene Tasks:", response.data);
-console.log("Tasks nach Status gruppiert:", tasksByStatus);
-      } catch (error) {
-        console.error("Fehler beim Laden der Tasks:", error);
-      }
-    };
-    if (teamId) {
-      fetchTask();
+  const fetchTasks = async () => {
+    if (!teamId) return;
+
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:5000/teams/${teamId}/tasks`, {
+        params: { userId },
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setTasks(response.data);
+      console.log("✅ Geladene Tasks:", response.data);
+    } catch (error) {
+      console.error("❌ Fehler beim Laden der Tasks:", error);
     }
-  }, [userId, teamId]);
+  };
+
+  useEffect(() => {
+    fetchTasks();
+  }, [teamId]);
 
   const handleCreateTask = (newTask) => {
     setTasks([...tasks, newTask]);
   };
 
-  // Unterscheidung im onDragEnd-Handler:
-  // - Falls ein Column-Item (Status) gezogen wurde, wird die Reihenfolge der Columns aktualisiert.
-  // - Falls eine TaskCard gezogen wurde (ID im Format "task-<id>"), wird der Task-Status geändert.
   const handleDragEnd = async (event) => {
     const { active, over } = event;
     if (!over) return;
-  
+
     if (columnOrder.includes(active.id)) {
       if (active.id !== over.id) {
         const oldIndex = columnOrder.indexOf(active.id);
         const newIndex = columnOrder.indexOf(over.id);
         const newOrder = arrayMove(columnOrder, oldIndex, newIndex);
         setColumnOrder(newOrder);
-  
+
         try {
           const token = localStorage.getItem("token");
           await axios.put(
@@ -108,37 +105,48 @@ console.log("Tasks nach Status gruppiert:", tasksByStatus);
             { columnOrder: newOrder },
             { headers: { Authorization: `Bearer ${token}` } }
           );
+          console.log("✅ Spaltenreihenfolge erfolgreich aktualisiert:", newOrder);
         } catch (error) {
-          console.error("Fehler beim Aktualisieren der Spaltenreihenfolge:", error);
+          console.error("❌ Fehler beim Speichern der Spaltenreihenfolge:", error);
         }
       }
     } else {
       const activeTaskId = active.id.replace("task-", "");
       const newStatus = over.id;
-      if (newStatus && activeTaskId) {
-        const updatedTasks = tasks.map((task) =>
-          task.id.toString() === activeTaskId ? { ...task, status: newStatus } : task
-        );
-        setTasks(updatedTasks);
-  
-        try {
-          const token = localStorage.getItem("token");
-          await axios.put(
-            `http://localhost:5000/tasks/${activeTaskId}/status`,
-            { newStatus },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-        } catch (error) {
-          console.error("Fehler beim Aktualisieren des Task-Status:", error);
-        }
+
+      console.log("🔄 Task-DnD:", { activeTaskId, newStatus });
+
+      if (!columnOrder.includes(newStatus)) {
+        console.error("❌ Fehler: Ungültiger Status", newStatus);
+        return;
       }
-    }  
+
+      const updatedTasks = tasks.map((task) =>
+        task.id.toString() === activeTaskId ? { ...task, status: newStatus } : task
+      );
+      setTasks(updatedTasks);
+
+      try {
+        const token = localStorage.getItem("token");
+        await axios.put(
+          `http://localhost:5000/tasks/${activeTaskId}/status`,
+          { status: newStatus },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        console.log("✅ Task-Status erfolgreich aktualisiert:", newStatus);
+        fetchTasks();
+      } catch (error) {
+        console.error("❌ Fehler beim Aktualisieren des Task-Status:", error);
+      }
+    }
   };
 
   const tasksByStatus = columnOrder.reduce((acc, status) => {
     acc[status] = tasks.filter((task) => task.status === status);
     return acc;
   }, {});
+
+  console.log("✅ Tasks nach Status gruppiert:", tasksByStatus);
 
   return (
     <div className="board-background">
@@ -149,8 +157,9 @@ console.log("Tasks nach Status gruppiert:", tasksByStatus);
         </button>
         {isCreateTaskOpen && (
           <AddTask 
-          onClose={() => setCreateTaskOpen(false)} 
-          onCreate={handleCreateTask} />
+            onClose={() => setCreateTaskOpen(false)} 
+            onCreate={handleCreateTask} 
+          />
         )}
         <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
           <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
@@ -160,6 +169,8 @@ console.log("Tasks nach Status gruppiert:", tasksByStatus);
                   key={status}
                   status={status}
                   tasks={tasksByStatus[status] || []}
+                  refreshTaskList={fetchTasks}
+                  className="drag-column"
                 />
               ))}
             </div>

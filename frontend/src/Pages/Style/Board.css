@@ -12,12 +12,27 @@
     width: 85vw;
     height: 80vh;
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-around;
     border-radius: 15px;
-    margin: 0 30px 30px 75px;
+    margin: 0 20px 30px 75px;
     color: white;
+    padding: 10px;
 }
 
 .task-btn{
-    margin-left: 60px;
+    margin-left: 80px;
+}
+
+.column-style{
+    padding: 15px;
+    flex: 1;
+    margin: 8px;
+    background-color: #0033FF;
+    border-radius: 15px;
+    height: 85%;
+}
+
+.drag-column{
+    background-color: #f9f9f9;
 }
