@@ -4,64 +4,27 @@ import Sidebar from "../Component/SideBar";
 import AddTask from "../Component/CreatTaskModal";
 import { useParams } from "react-router-dom";
 import axios from "axios";
-import { DndContext, closestCenter } from "@dnd-kit/core";
-import {
-  SortableContext,
-  horizontalListSortingStrategy,
-  arrayMove,
-  useSortable,
-} from "@dnd-kit/sortable";
+import { DndContext, closestCorners, useDroppable, DragOverlay } from "@dnd-kit/core";
+import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import TaskCard from "../Component/TaskCard";
+import TaskModal from "../Component/TaskModal";
 
-const statuses = [ "Planning","To Do", "In Progress", "Done"];
-
-function Column({ tasks, refreshTaskList }) {
-  
-  return (
-    <div className="column-style">
-      {tasks.map((task) => (
-        <TaskCard key={task.id} task={task} refreshTaskList={refreshTaskList} />
-      ))}
-    </div>
-  );
-}
-
-function DraggableColumn({ status, tasks, refreshTaskList }) {
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({
-    id: status,
-  });
-
-  const style = {
-    transform: transform ? CSS.Transform.toString(transform) : undefined,
-    transition,
-    backgroundColor: "rgba(255, 255, 255, 0.2)",
-    backdropFilter: "blur(12px) saturate(180%)",
-    WebkitBackdropFilter: "blur(12px) saturate(180%)",
-    borderRadius: "15px",
-    flex: 1,
-    margin: "8px",
-    boxShadow: "0 4px 6px rgba(0, 0, 0, 0.1)",
-    border: "1px solid rgba(255, 255, 255, 0.3)", 
-  };
-
-  return (
-    <div ref={setNodeRef} style={style}>
-      <div {...attributes} {...listeners} 
-        style={{ cursor: "grab", fontWeight: "bold", display:"flex", justifyContent:"center", alignItem:"center", fontSize:"24px" }}>
-        {status}
-      </div>
-      <Column status={status} tasks={tasks} refreshTaskList={refreshTaskList} />
-    </div>
-  );
-}
+const statuses = ["Planning", "To Do", "In Progress", "Done"];
 
 function Board() {
   const { teamId } = useParams();
   const [isCreateTaskOpen, setCreateTaskOpen] = useState(false);
-  const [tasks, setTasks] = useState([]);
-  const [columnOrder, setColumnOrder] = useState(statuses);
+  const [columns, setColumns] = useState(statuses.map((status) => ({ id: status, title: status, tasks: [] })));
+  const [selectedTask, setSelectedTask] = useState(null);
   const userId = JSON.parse(localStorage.getItem("user"))?.id;
+  const [activeTask, setActiveTask] = useState(null);
+  const [activeTaskId, setActiveTaskId] = useState(null);
+
+
+  useEffect(() => {
+    fetchTasks();
+  }, [teamId]);
 
   const fetchTasks = async () => {
     if (!teamId) return;
@@ -72,81 +35,98 @@ function Board() {
         params: { userId },
         headers: { Authorization: `Bearer ${token}` },
       });
-      setTasks(response.data);
+
+      const groupedTasks = statuses.map((status) => ({
+        id: status,
+        title: status,
+        tasks: response.data.filter((task) => task.status === status),
+      }));
+
+      setColumns(groupedTasks);
       console.log("✅ Geladene Tasks:", response.data);
     } catch (error) {
       console.error("❌ Fehler beim Laden der Tasks:", error);
     }
   };
 
-  useEffect(() => {
-    fetchTasks();
-  }, [teamId]);
-
   const handleCreateTask = (newTask) => {
-    setTasks([...tasks, newTask]);
+    setColumns((prev) =>
+      prev.map((col) => (col.id === newTask.status ? { ...col, tasks: [...col.tasks, newTask] } : col))
+    );
   };
+  
+  const handleDragStart = (event) => {
+    const { active } = event;
+    const activeId = active.id.replace("task-", "");
 
-  const handleDragEnd = async (event) => {
-    const { active, over } = event;
-    if (!over) return;
+    setActiveTaskId(activeId);
 
-    if (columnOrder.includes(active.id)) {
-      if (active.id !== over.id) {
-        const oldIndex = columnOrder.indexOf(active.id);
-        const newIndex = columnOrder.indexOf(over.id);
-        const newOrder = arrayMove(columnOrder, oldIndex, newIndex);
-        setColumnOrder(newOrder);
-
-        try {
-          const token = localStorage.getItem("token");
-          await axios.put(
-            `http://localhost:5000/teams/${teamId}/column-order`,
-            { columnOrder: newOrder },
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          console.log("✅ Spaltenreihenfolge erfolgreich aktualisiert:", newOrder);
-        } catch (error) {
-          console.error("❌ Fehler beim Speichern der Spaltenreihenfolge:", error);
-        }
-      }
-    } else {
-      const activeTaskId = active.id.replace("task-", "");
-      const newStatus = over.id;
-
-      console.log("🔄 Task-DnD:", { activeTaskId, newStatus });
-
-      if (!columnOrder.includes(newStatus)) {
-        console.error("❌ Fehler: Ungültiger Status", newStatus);
-        return;
-      }
-
-      const updatedTasks = tasks.map((task) =>
-        task.id.toString() === activeTaskId ? { ...task, status: newStatus } : task
-      );
-      setTasks(updatedTasks);
-
-      try {
-        const token = localStorage.getItem("token");
-        await axios.put(
-          `http://localhost:5000/tasks/${activeTaskId}/status`,
-          { status: newStatus },
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        console.log("✅ Task-Status erfolgreich aktualisiert:", newStatus);
-        fetchTasks();
-      } catch (error) {
-        console.error("❌ Fehler beim Aktualisieren des Task-Status:", error);
-      }
+    const task = columns.flatMap((col) => col.tasks).find((t) => t.id.toString() === activeId);
+    if (task) {
+        setActiveTask(task);
     }
-  };
+};
 
-  const tasksByStatus = columnOrder.reduce((acc, status) => {
-    acc[status] = tasks.filter((task) => task.status === status);
-    return acc;
-  }, {});
+const handleDragEnd = async (event) => {
+  setActiveTaskId(null); // 🔹 Task wieder sichtbar machen
+  setActiveTask(null); // 🔹 Overlay entfernen
 
-  console.log("✅ Tasks nach Status gruppiert:", tasksByStatus);
+  const { active, over } = event;
+  if (!over) return;
+
+  const activeId = active.id.replace("task-", "");
+  let overContainer = over.id;
+
+  // 🔹 Falls `over.id` eine Task ist, die Spalte suchen
+  if (overContainer.startsWith("task-")) {
+      const taskId = overContainer.replace("task-", "");
+      const foundColumn = columns.find((col) => col.tasks.some((task) => task.id.toString() === taskId));
+      if (foundColumn) {
+          overContainer = foundColumn.id;
+      } else {
+          console.error("❌ Fehler: Task konnte keiner Spalte zugeordnet werden.");
+          return;
+      }
+  }
+
+  console.log("🔄 Task wird verschoben:", { activeId, neuerStatus: overContainer });
+
+  const oldColumn = columns.find((col) => col.tasks.some((task) => task.id.toString() === activeId));
+  if (!oldColumn) return;
+
+  // ✅ Wenn die Task in derselben Spalte bleibt → Zurück animieren
+  if (oldColumn.id === overContainer) {
+      console.log("🔙 Task bleibt in der gleichen Spalte. Transformiere zurück.");
+      return;
+  }
+
+  // ✅ Wenn die Task in eine neue Spalte geht → Speichern und bewegen
+  setColumns((prev) =>
+      prev.map((col) =>
+          col.tasks.some((task) => task.id.toString() === activeId)
+              ? { ...col, tasks: col.tasks.filter((task) => task.id.toString() !== activeId) }
+              : col.id === overContainer
+              ? { ...col, tasks: [...col.tasks, { ...prev.flatMap(c => c.tasks).find(t => t.id.toString() === activeId), status: overContainer }] }
+              : col
+      )
+  );
+
+  // ✅ API-Call zum Speichern des neuen Status
+  try {
+      const token = localStorage.getItem("token");
+      console.log(`📡 Sende API-Update für Task ID: ${activeId}, Neuer Status: ${overContainer}`);
+      
+      await axios.put(
+          `http://localhost:5000/tasks/${activeId}/status`,
+          { status: overContainer }, 
+          { headers: { Authorization: `Bearer ${token}` } }
+      );
+
+      console.log("✅ Task-Status erfolgreich aktualisiert");
+  } catch (error) {
+      console.error("❌ Fehler beim Aktualisieren des Task-Status:", error.response ? error.response.data : error);
+  }
+};
 
   return (
     <div className="board-background">
@@ -156,27 +136,51 @@ function Board() {
           Task erstellen
         </button>
         {isCreateTaskOpen && (
-          <AddTask 
-            onClose={() => setCreateTaskOpen(false)} 
-            onCreate={handleCreateTask} 
-          />
+          <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
         )}
-        <DndContext onDragEnd={handleDragEnd} collisionDetection={closestCenter}>
-          <SortableContext items={columnOrder} strategy={horizontalListSortingStrategy}>
+
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+          <SortableContext items={columns.map((col) => col.id)}>
             <div className="board-box" style={{ display: "flex" }}>
-              {columnOrder.map((status) => (
-                <DraggableColumn
-                  key={status}
-                  status={status}
-                  tasks={tasksByStatus[status] || []}
-                  refreshTaskList={fetchTasks}
-                  className="drag-column"
-                />
+              {columns.map((column) => (
+                <Column key={column.id} column={column} onTaskClick={setSelectedTask} />
               ))}
             </div>
           </SortableContext>
+          <DragOverlay>
+            {activeTask ? <TaskCard task={activeTask} /> : null}
+          </DragOverlay>
+
         </DndContext>
       </div>
+
+      <TaskModal isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} refreshTaskList={fetchTasks} />
+    </div>
+  );
+}
+
+function Column({ column, onTaskClick, activeTaskId }) {
+  const { setNodeRef } = useDroppable({ id: column.id });
+  const { attributes, listeners, setNodeRef: setDragRef, transform, transition } = useSortable({
+    id: column.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition
+  };
+
+  return (
+    <div ref={setNodeRef} style={style} className="column-div">
+      <div ref={setDragRef} {...attributes} {...listeners} className="column-title row">
+        <div>{column.title}</div>
+        <div>☰ </div>
+      </div>
+      <SortableContext items={column.tasks.map((item) => `task-${item.id}`)} strategy={verticalListSortingStrategy}>
+        {column.tasks.map((task) => (
+          <TaskCard key={task.id} task={task} onTaskClick={onTaskClick} activeTaskId={activeTaskId}/>
+        ))}
+      </SortableContext>
     </div>
   );
 }
