@@ -382,19 +382,28 @@ app.get("/teams/:teamId/tasks/:taskId", authenticate, async (req, res) => {
   }
 });
 
-// 🔹 Task aktualisieren mit `teamId` in der Route
 app.put("/teams/:teamId/tasks/:taskId", authenticate, async (req, res) => {
   const { teamId, taskId } = req.params;
-  const { title, description, points, status, assigned_to } = req.body;
-  const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archiv"];
+  const { title, description, status, assigned_to } = req.body;
 
-  // 🔹 Validierung: Status prüfen
+  // Status prüfen
+  const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archived"];
   if (!validStatuses.includes(status)) {
     return res.status(400).json({ error: "❌ Ungültiger Status: " + status });
   }
 
+  // 🎯 Automatische Punktevergabe nach Status
+  const pointsByStatus = {
+    "Planning": 1,
+    "To Do": 2,
+    "In Progress": 3,
+    "Done": 5,
+    "Archived": 0
+  };
+  const points = pointsByStatus[status] ?? 0;
+
   try {
-    // 🔹 Prüfen, ob die Task in diesem Team existiert & der Benutzer Mitglied ist
+    // 🔐 Rechteprüfung
     const taskCheck = await pool.query(
       `SELECT t.id FROM tasks t
        JOIN team_members tm ON t.team_id = tm.team_id
@@ -406,15 +415,21 @@ app.put("/teams/:teamId/tasks/:taskId", authenticate, async (req, res) => {
       return res.status(403).json({ error: "🚫 Keine Berechtigung für diese Task oder falsches Team" });
     }
 
-    // 🔹 Task-Daten aktualisieren
+    // ✅ Task-Daten aktualisieren
     const updateQuery = `
       UPDATE tasks 
       SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5 
       WHERE id = $6 AND team_id = $7
       RETURNING *`;
-    
+
     const updatedTask = await pool.query(updateQuery, [
-      title, description, points, status, assigned_to, taskId, teamId
+      title,
+      description,
+      points,
+      status,
+      assigned_to,
+      taskId,
+      teamId
     ]);
 
     res.json({ message: "✅ Task erfolgreich aktualisiert", task: updatedTask.rows[0] });
@@ -423,6 +438,7 @@ app.put("/teams/:teamId/tasks/:taskId", authenticate, async (req, res) => {
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 });
+
 
 // Task-Status aktualisieren via Drag & Drop oder manuel
 app.put("/tasks/:taskId/status", authenticate, async (req, res) => {

@@ -1,8 +1,8 @@
 
 .overlayStyleCard  {
-    position: fixed;  /* 🔥 WICHTIG: Damit es sich nicht von Parent-Container beeinflussen lässt */
-    top: 0;
-    left: 0;
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100vw;
   height: 100vh;
   background-color: rgba(0, 0, 0, 0.5);
@@ -13,9 +13,9 @@
 }
 
 .modalStyleCard {
-  background-color: #fff;
-  color: black;
-  padding: 20px;
+  background: linear-gradient(to bottom ,#0033FF, #00033D);
+  color: #FFCCF2;
+  padding: 25px;
   border-radius: 8px;
   width: 400px;
   max-width: 90%;
@@ -29,18 +29,28 @@
   margin-top: 10px;
   padding: 8px 16px;
   border: none;
-  background-color: green;
-  color: black;
+  background-color: #0033FF;
+  color: #F2E6EE;
   cursor: pointer;
   border-radius: 15px;
 }
 
-.closeButtonStyleCard {
-  margin-top: 10px;
-  padding: 8px 16px;
-  border: none;
-  background-color: red;
-  color: white;
-  cursor: pointer;
-  border-radius: 15px;
-};
+.task-head{
+  justify-content: space-between;
+}
+
+.modalStyleCard input {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: #F2E6EE;
+  color: #00033D;
+}
+
+.modalStyleCard textarea{
+  color: #00033D;
+  background-color: #F2E6EE;
+  min-height: 25px;
+  padding: 5px;
+  border-radius: 5px;
+
+}

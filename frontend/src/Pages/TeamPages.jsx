@@ -10,23 +10,19 @@ function TeamPage() {
   const [team, setTeam] = useState(null);
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
 
-  // Team-Details laden
   useEffect(() => {
     const fetchTeamData = async () => {
       try {
         const token = localStorage.getItem("token");
   
-        // Erster Aufruf: Team-Daten
         const teamResponse = await axios.get(`http://localhost:5000/teams/${teamId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        // Zweiter Aufruf: Team-Mitglieder
         const membersResponse = await axios.get(`http://localhost:5000/teams/${teamId}/members`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        // Zusammenführen der Daten
         setTeam({ ...teamResponse.data, members: membersResponse.data });
       } catch (error) {
         console.error("Fehler beim Laden des Teams:", error);
@@ -43,7 +39,7 @@ function TeamPage() {
   return (
     <div className="teampage">
       <Sidebar/>
-      <div className="team-uebersicht-div">
+      <div className="column team-uebersicht-div">
         <h1>{team.name}</h1>
         <div>
           <button className="button" onClick={() => setIsInviteModalOpen(true)}>

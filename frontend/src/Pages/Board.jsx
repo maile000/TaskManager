@@ -43,7 +43,6 @@ function Board() {
       }));
 
       setColumns(groupedTasks);
-      console.log("✅ Geladene Tasks:", response.data);
     } catch (error) {
       console.error("❌ Fehler beim Laden der Tasks:", error);
     }
@@ -68,8 +67,8 @@ function Board() {
 };
 
 const handleDragEnd = async (event) => {
-  setActiveTaskId(null); // 🔹 Task wieder sichtbar machen
-  setActiveTask(null); // 🔹 Overlay entfernen
+  setActiveTaskId(null);
+  setActiveTask(null); 
 
   const { active, over } = event;
   if (!over) return;
@@ -77,7 +76,6 @@ const handleDragEnd = async (event) => {
   const activeId = active.id.replace("task-", "");
   let overContainer = over.id;
 
-  // 🔹 Falls `over.id` eine Task ist, die Spalte suchen
   if (overContainer.startsWith("task-")) {
       const taskId = overContainer.replace("task-", "");
       const foundColumn = columns.find((col) => col.tasks.some((task) => task.id.toString() === taskId));
@@ -89,18 +87,14 @@ const handleDragEnd = async (event) => {
       }
   }
 
-  console.log("🔄 Task wird verschoben:", { activeId, neuerStatus: overContainer });
-
   const oldColumn = columns.find((col) => col.tasks.some((task) => task.id.toString() === activeId));
   if (!oldColumn) return;
 
-  // ✅ Wenn die Task in derselben Spalte bleibt → Zurück animieren
   if (oldColumn.id === overContainer) {
       console.log("🔙 Task bleibt in der gleichen Spalte. Transformiere zurück.");
       return;
   }
 
-  // ✅ Wenn die Task in eine neue Spalte geht → Speichern und bewegen
   setColumns((prev) =>
       prev.map((col) =>
           col.tasks.some((task) => task.id.toString() === activeId)
@@ -131,30 +125,33 @@ const handleDragEnd = async (event) => {
   return (
     <div className="board-background">
       <Sidebar defaultOpen={false} />
-      <div>
-        <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
-          Task erstellen
-        </button>
-        {isCreateTaskOpen && (
-          <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
-        )}
+      <div className="row">
+        <div style={{width:"100px", height:"auto"}}></div>
+        <div>
+          <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
+            Task erstellen
+          </button>
+          {isCreateTaskOpen && (
+            <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
+          )}
 
-        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
-          <SortableContext items={columns.map((col) => col.id)}>
-            <div className="board-box" style={{ display: "flex" }}>
-              {columns.map((column) => (
-                <Column key={column.id} column={column} onTaskClick={setSelectedTask} />
-              ))}
-            </div>
-          </SortableContext>
-          <DragOverlay>
-            {activeTask ? <TaskCard task={activeTask} /> : null}
-          </DragOverlay>
-
-        </DndContext>
+          <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
+            <SortableContext items={columns.map((col) => col.id)}>
+              <div className="board-box" style={{ display: "flex" }}>
+                {columns.map((column) => (
+                  <Column key={column.id} column={column} onTaskClick={setSelectedTask} />
+                ))}
+              </div>
+            </SortableContext>
+            <DragOverlay>
+              {activeTask ? <TaskCard task={activeTask} /> : null}
+            </DragOverlay>
+          </DndContext>
+        </div>
       </div>
+     
 
-      <TaskModal isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} refreshTaskList={fetchTasks} />
+      <TaskModal key={selectedTask?.id || "new"}  isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} refreshTaskList={fetchTasks} />
     </div>
   );
 }
