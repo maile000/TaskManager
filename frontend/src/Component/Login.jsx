@@ -16,7 +16,7 @@ function Login({ setUser }) {
     e.preventDefault();
     console.log("📌 Login-Daten:", formData);
     try {
-      const res = await axios.post("http://localhost:5000/login", formData);
+      const res = await axios.post("http://localhost:5000/api/login", formData);
       console.log("📌 Server-Antwort:", res.data); 
 
       if (res && res.data && res.data.token && res.data.user) {

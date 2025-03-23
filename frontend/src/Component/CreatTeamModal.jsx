@@ -12,7 +12,7 @@ const CreateTeamModal = ({ onClose, onCreate }) => {
       const userId = JSON.parse(localStorage.getItem("user")).id;
 
       const response = await axios.post(
-        "http://localhost:5000/create-team",
+        "http://localhost:5000/api/create-team",
         { userId, teamName },
         {
           headers: {

@@ -15,11 +15,11 @@ function TeamPage() {
       try {
         const token = localStorage.getItem("token");
   
-        const teamResponse = await axios.get(`http://localhost:5000/teams/${teamId}`, {
+        const teamResponse = await axios.get(`http://localhost:5000/api/teams/${teamId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
-        const membersResponse = await axios.get(`http://localhost:5000/teams/${teamId}/members`, {
+        const membersResponse = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
           headers: { Authorization: `Bearer ${token}` },
         });
   
@@ -55,13 +55,20 @@ function TeamPage() {
         {team.members && team.members.length > 0 ? (
           <div className="team-members">
             <h2>Teammitglieder</h2>
-            <ul>
-              {team.members.map((member) => (
-                <li key={member.id}>
-                  {member.name} - {member.role}
-                </li>
+            <div className="teammitglied-card">
+            {team.members.map((member) => (
+                <div key={member.id}>
+                  <div>
+                    <strong>
+                      {member.name}
+                    </strong>
+                  </div>
+                  <div>
+                  {member.role}
+                  </div> 
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
         ) : (
           <p>Keine Mitglieder gefunden.</p>

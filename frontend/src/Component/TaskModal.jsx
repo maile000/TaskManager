@@ -10,13 +10,13 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
   const [description, setDescription] = useState("");
   const [status, setStatus] = useState("To Do");
   const [assignedTo, setAssignedTo] = useState("");
+  const [teamMembers, setTeamMembers] = useState([]);
 
-  // 🧠 Punkte abhängig vom Status
   const pointsByStatus = {
-    "Planning": 1,
-    "To Do": 2,
-    "In Progress": 3,
-    "Done": 5,
+    "Planning": 100,
+    "To Do": 200,
+    "In Progress": 300,
+    "Done": 500,
     "Archived": 0
   };
 
@@ -28,6 +28,22 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       setAssignedTo(task.assigned_to || "");
     }
   }, [task]);
+
+  useEffect(() => {
+    if (!teamId) return;
+    const fetchMembers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTeamMembers(response.data);
+      } catch (error) {
+        console.error("❌ Fehler beim Laden der Teammitglieder:", error);
+      }
+    };
+    fetchMembers();
+  }, [teamId]);
 
   if (!isOpen || !task) {
     return null;
@@ -46,14 +62,14 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       };
 
       await axios.put(
-        `http://localhost:5000/teams/${teamId}/tasks/${task.id}`,
+        `http://localhost:5000/api/teams/${teamId}/tasks/${task.id}`,
         updatedTask,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       console.log("✅ Task erfolgreich aktualisiert!");
 
-      await refreshTaskList(); // wichtig: Warten bis alle Tasks neu geladen
+      await refreshTaskList();
       setIsEditing(false);
       onClose();
     } catch (error) {
@@ -100,11 +116,23 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
 
         <label><strong>Assigned To:</strong></label>
         {isEditing ? (
-          <input type="text" value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)} />
+          <select value={assignedTo || ""} onChange={(e) => setAssignedTo(e.target.value)}>
+            <option value="">-- Nicht zugewiesen --</option>
+            {teamMembers.map((member) => (
+              <option key={member.id} value={member.id}>
+                {member.name}
+              </option>
+            ))}
+          </select>
         ) : (
-          <p>{assignedTo}</p>
+          <p>
+            {
+              teamMembers.find((m) => m.id === task.assigned_to)?.name
+              || "Nicht zugewiesen"
+            }
+          </p>
         )}
-
+        <p><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
         <p><strong>Punkte (automatisch):</strong> {pointsByStatus[status]}</p>
 
         {isEditing && (

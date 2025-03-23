@@ -9,12 +9,12 @@ import Board from "./Pages/Board";
 import Home from "./Pages/Home";
 import Team from "./Pages/Team";
 import TeamPage from "./Pages/TeamPages";
+import Profil from "./Pages/Profil";
 
 function App() {
     const [user, setUser] = useState(false);
     const [loading, setLoading] = useState(true);
 
-    // Funktion zum Überprüfen, ob der Token abgelaufen ist (Voraussetzung: JWT-Format)
     const isTokenExpired = (token) => {
         try {
             const payload = JSON.parse(atob(token.split('.')[1]));
@@ -35,11 +35,9 @@ function App() {
     };
 
     useEffect(() => {
-        // Direkt beim Laden den Token prüfen
         checkToken();
         setLoading(false);
 
-        // Optional: Regelmäßige Überprüfung alle 60 Sekunden
         const interval = setInterval(() => {
             checkToken();
         }, 60000);
@@ -64,7 +62,7 @@ function App() {
                 <Route path="/login" element={user ? <Navigate to="/dashboard" /> : <Login setUser={setUser} />} />
                 <Route path="/register" element={user ? <Navigate to="/dashboard" /> : <Register setUser={setUser} />} />
                 <Route path="/team/:teamId/dashboard" element={user ? <Board /> : <Navigate to="/login" />} />
-                <Route path="/profile" element={user ? <Profile /> : <Navigate to="/login" />} />
+                <Route path="/profile" element={user ? <Profil /> : <Navigate to="/login" />} />
                 <Route path="/team/:teamId" element={user ? <TeamPage /> : <Navigate to="/login" />} />
                 <Route path="/team" element={user ? <Team /> : <Navigate to="/login" />} />
             </Routes>
@@ -72,8 +70,5 @@ function App() {
     );
 }
 
-function Profile() {
-    return <h1>Dein Profil</h1>;
-}
 
 export default App;

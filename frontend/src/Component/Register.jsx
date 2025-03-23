@@ -17,11 +17,11 @@ function Register({ setUser }) {
     e.preventDefault();
 
     try {
-      const res = await axios.post("http://localhost:5000/register", formData);
+      const res = await axios.post("http://localhost:5000/api/register", formData);
 
       if (res && res.data) {
         console.log("✅ Erfolgreich registriert:", res.data);
-        const loginRes = await axios.post("http://localhost:5000/login", {
+        const loginRes = await axios.post("http://localhost:5000/api/login", {
           email: formData.email,
           password: formData.password,
         });

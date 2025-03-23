@@ -15,7 +15,7 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
     const fetchMembers = async () => {
       const token = localStorage.getItem("token");
       try {
-        const response = await axios.get(`http://localhost:5000/teams/${teamId}/members`, {
+        const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setMembers(response.data);
@@ -37,7 +37,7 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
 
     try {
       const response = await axios.post(
-        `http://localhost:5000/teams/${teamId}/tasks`,
+        `http://localhost:5000/api/teams/${teamId}/tasks`,
         {
           title,
           description,

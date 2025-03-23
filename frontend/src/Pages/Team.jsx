@@ -16,7 +16,7 @@ function Team() {
     const fetchTeams = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await axios.get("http://localhost:5000/teams", {
+        const response = await axios.get("http://localhost:5000/api/teams", {
           params: { userId }, 
           headers: {
             Authorization: `Bearer ${token}`,

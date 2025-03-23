@@ -19,8 +19,6 @@ function Board() {
   const [selectedTask, setSelectedTask] = useState(null);
   const userId = JSON.parse(localStorage.getItem("user"))?.id;
   const [activeTask, setActiveTask] = useState(null);
-  const [activeTaskId, setActiveTaskId] = useState(null);
-
 
   useEffect(() => {
     fetchTasks();
@@ -31,7 +29,7 @@ function Board() {
 
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get(`http://localhost:5000/teams/${teamId}/tasks`, {
+      const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/tasks`, {
         params: { userId },
         headers: { Authorization: `Bearer ${token}` },
       });
@@ -58,7 +56,7 @@ function Board() {
     const { active } = event;
     const activeId = active.id.replace("task-", "");
 
-    setActiveTaskId(activeId);
+    
 
     const task = columns.flatMap((col) => col.tasks).find((t) => t.id.toString() === activeId);
     if (task) {
@@ -67,7 +65,7 @@ function Board() {
 };
 
 const handleDragEnd = async (event) => {
-  setActiveTaskId(null);
+  
   setActiveTask(null); 
 
   const { active, over } = event;
@@ -105,13 +103,12 @@ const handleDragEnd = async (event) => {
       )
   );
 
-  // ✅ API-Call zum Speichern des neuen Status
   try {
       const token = localStorage.getItem("token");
       console.log(`📡 Sende API-Update für Task ID: ${activeId}, Neuer Status: ${overContainer}`);
       
       await axios.put(
-          `http://localhost:5000/tasks/${activeId}/status`,
+          `http://localhost:5000/api/tasks/${activeId}/status`,
           { status: overContainer }, 
           { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -173,7 +170,7 @@ function Column({ column, onTaskClick, activeTaskId }) {
         <div>{column.title}</div>
         <div>☰ </div>
       </div>
-      <SortableContext items={column.tasks.map((item) => `task-${item.id}`)} strategy={verticalListSortingStrategy}>
+      <SortableContext items={column.tasks.map((item) => `task-${item.id}`)} strategy={verticalListSortingStrategy} >
         {column.tasks.map((task) => (
           <TaskCard key={task.id} task={task} onTaskClick={onTaskClick} activeTaskId={activeTaskId}/>
         ))}

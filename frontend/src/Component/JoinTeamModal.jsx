@@ -11,7 +11,7 @@ const JoinTeamModal = ({ onClose, onJoin }) => {
       const userId = JSON.parse(localStorage.getItem("user")).id;
 
       const response = await axios.post(
-        "http://localhost:5000/join-team",
+        "http://localhost:5000/api/join-team",
         { userId, inviteCode },
         {
           headers: {
