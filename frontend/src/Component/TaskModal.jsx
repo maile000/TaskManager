@@ -11,6 +11,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
   const [status, setStatus] = useState("To Do");
   const [assignedTo, setAssignedTo] = useState("");
   const [teamMembers, setTeamMembers] = useState([]);
+  const [priority_flag, setFlag] = useState("");
 
   const pointsByStatus = {
     "Planning": 100,
@@ -26,6 +27,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       setDescription(task.description || "");
       setStatus(task.status || "To Do");
       setAssignedTo(task.assigned_to || "");
+      setFlag(task.priority_flag || "Low");
     }
   }, [task]);
 
@@ -59,6 +61,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
         status,
         assigned_to: assignedTo,
         points: pointsByStatus[status] || 0,
+        priority_flag,
       };
 
       await axios.put(
@@ -112,6 +115,18 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
           </select>
         ) : (
           <p>{status}</p>
+        )}
+
+        <label><strong>flag:</strong></label>
+        {isEditing ? (
+          <select value={priority_flag} onChange={(e) => setFlag(e.target.value)}>
+            <option value="Low">Low</option>
+            <option value="Medium">Medium</option>
+            <option value="High">High</option>
+            <option value="Critical">Critical</option>
+          </select>
+        ) : (
+          <p>{priority_flag}</p>
         )}
 
         <label><strong>Assigned To:</strong></label>

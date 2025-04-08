@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
+import "./StyleComp/AvatarOption.css";
 
-function AvatarOptionen() {
+function AvatarOptionen({ onAvatarSelected }) {
   const [avatars, setAvatars] = useState([]);
+  const [clickedIndex, setClickedIndex] = useState(null);
 
   const token = localStorage.getItem('token');
-  const seeds = ['drache', 'katze', 'avatarX', 'hexer', 'kaktus'];
-  const styles = ['bottts', 'pixelArt', 'lorelei'];
+  const seeds = ['Destiny', 'Oliver', 'Riley', 'Brian', 'Sara'];
+  const styles = ['bottts'];
   const farben = ['#ffcc00', '#1e90ff', '#ff69b4', '#32cd32', '#ffa500'];
 
   useEffect(() => {
@@ -38,7 +40,9 @@ function AvatarOptionen() {
     fetchAvatars();
   }, []);
 
-  const handleSelect = async (avatar) => {
+  const handleSelect = async (avatar, index) => {
+    setClickedIndex(index); // 🟢 Animation starten
+
     const res = await fetch('http://localhost:5000/api/avatar', {
       method: 'POST',
       headers: {
@@ -52,25 +56,27 @@ function AvatarOptionen() {
       }),
     });
 
-    if (res.ok) {
-      alert('✅ Avatar gespeichert!');
-    } else {
-      alert('❌ Fehler beim Speichern');
+    if (res.ok && typeof onAvatarSelected === 'function') {
+      setTimeout(() => {
+        onAvatarSelected();
+      }, 600); // nach Animation
     }
   };
 
   return (
-    <div>
+    <div className='avatar-component'>
       <h3>Wähle deinen Avatar</h3>
-      <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+      <div className='avatar-div'>
         {avatars.map((avatar, i) => (
           <div
             key={i}
-            onClick={() => handleSelect(avatar)}
-            style={{ cursor: 'pointer', border: '1px solid #ccc', padding: '8px' }}
+            onClick={() => handleSelect(avatar, i)}
+            className={`avatar-card ${clickedIndex === i ? "clicked" : ""}`}
           >
-            <div dangerouslySetInnerHTML={{ __html: avatar.svg }} />
-            <p style={{ fontSize: '0.8em' }}>{avatar.seed}</p>
+            <div
+              dangerouslySetInnerHTML={{ __html: avatar.svg }}
+              className='avatar-option'
+            />
           </div>
         ))}
       </div>

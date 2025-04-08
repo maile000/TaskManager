@@ -1,7 +1,7 @@
 exports.createTask = async (req, res) => {
     const pool = req.app.locals.pool;
     const { teamId } = req.params;
-    const { title, description, assignedTo, deadline } = req.body;
+    const { title, description, assignedTo, deadline ,priority_flag} = req.body;
     const userId = req.userId;
   
     if (!title) {
@@ -18,9 +18,9 @@ exports.createTask = async (req, res) => {
       }
   
       const newTask = await pool.query(
-        `INSERT INTO tasks (team_id, title, description, assigned_to, deadline, status)
-         VALUES ($1, $2, $3, $4, $5, 'To Do') RETURNING *`,
-        [teamId, title, description, assignedTo || null, deadline || null]
+        `INSERT INTO tasks (team_id, title, description, assigned_to, deadline, status,priority_flag)
+         VALUES ($1, $2, $3, $4, $5, 'To Do', $6) RETURNING *`,
+        [teamId, title, description, assignedTo || null, deadline || null, priority_flag || null]
       );
   
       res.json({ message: "Task erfolgreich erstellt", task: newTask.rows[0] });
@@ -92,10 +92,8 @@ exports.createTask = async (req, res) => {
   exports.updateTask = async (req, res) => {
     const pool = req.app.locals.pool;
     const { teamId, taskId } = req.params;
-    const { title, description, status, points, assigned_to } = req.body;
-  
-    console.log("📥 Update-Request Body:", req.body); // ← moved UP
-  
+    const { title, description, status, points, assigned_to,priority_flag } = req.body;
+    
     const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archived"];
     if (!validStatuses.includes(status)) {
       return res.status(400).json({ error: "❌ Ungültiger Status: " + status });
@@ -115,7 +113,7 @@ exports.createTask = async (req, res) => {
   
       const updateQuery = `
         UPDATE tasks 
-        SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5 
+        SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5, priority_flag = $8
         WHERE id = $6 AND team_id = $7
         RETURNING *`;
   
@@ -124,9 +122,10 @@ exports.createTask = async (req, res) => {
         description,
         points,
         status,
-        assigned_to === "" ? null : assigned_to, // 🧼 sicherstellen dass "" nicht crasht
+        assigned_to === "" ? null : assigned_to,
         taskId,
-        teamId
+        teamId,
+        priority_flag
       ];
   
       console.log("🧾 Query-Parameter:", updateValues);

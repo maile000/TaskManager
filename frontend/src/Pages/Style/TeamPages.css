@@ -4,7 +4,17 @@
 
 .team-uebersicht-div{
     align-items: center;
+}
 
+.team-members{
+    align-items: center;
+    text-align: center;
+}
+.teammitglied-list{
+    display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
 }
 
 .teammitglied-card{
@@ -21,4 +31,5 @@
     justify-content: center;
     align-items: center;
     color: #0033FF;
+    padding: 5px;
 }

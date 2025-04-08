@@ -53,4 +53,23 @@ exports.login = async (req, res) => {
       res.status(500).json({ error: "Interner Serverfehler" });
     }
   };
+
+  exports.getProfile = async (req, res) => {
+    const pool = req.app.locals.pool;
   
+    try {
+      const user = await pool.query(
+        "SELECT id, name, email, total_points, created_at, avatar_data FROM users WHERE id = $1",
+        [req.userId]
+      );
+  
+      if (user.rows.length === 0) {
+        return res.status(404).json({ error: "Benutzer nicht gefunden" });
+      }
+  
+      res.json(user.rows[0]);
+    } catch (err) {
+      console.error("❌ Fehler beim Abrufen des Profils:", err);
+      res.status(500).json({ error: "Interner Serverfehler" });
+    }
+  };

@@ -35,7 +35,8 @@ CREATE TABLE tasks (
     position INTEGER NOT NULL DEFAULT 0,
     assigned_to INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW(),
-    deadline TIMESTAMP
+    deadline TIMESTAMP,
+    priority_flag VARCHAR(20) CHECK (priority_flag IN ('Low', 'Medium', 'High', 'Critical')) NOT NULL DEFAULT 'Medium';
 );
 
 CREATE TABLE team_points (

@@ -1,0 +1,37 @@
+.profil-page{
+    justify-content: var();
+}
+
+.profil-head{
+    align-self: center;
+}
+
+.profil-block{
+    display: flex;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
+    height: 250px;
+    background-color: #00033D;
+}
+
+.profil-info-div{
+    display: flex;
+    flex-direction: column;
+    color: #977DFF;
+    margin: 30px;
+}
+
+.profil-info{
+    width: 150px;
+    height: 40px;
+    background-color: blue;
+    color: white;
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    margin: 15px;
+}

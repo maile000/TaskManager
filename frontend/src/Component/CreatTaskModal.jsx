@@ -10,6 +10,7 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
   const [deadline, setDeadline] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
   const [members, setMembers] = useState([]); 
+  const [priority_flag, setFlag] = useState("");
 
   useEffect(() => {
     const fetchMembers = async () => {
@@ -43,6 +44,7 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
           description,
           deadline,
           assignedTo: assignedTo || null, 
+          priority_flag: "Low" || null,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -81,6 +83,13 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
             />
+             <label>Flag</label>
+            <select value={priority_flag} onChange={(e) => setFlag(e.target.value)}>
+              <option value="Low">Low</option>
+              <option value="Medium">Medium</option>
+              <option value="High">High</option>
+              <option value="Critical">Critical</option>
+            </select>
             <label>Zuweisen an:</label>
             <select value={assignedTo} onChange={(e) => setAssignedTo(e.target.value)}>
               <option value="">Niemand</option>
