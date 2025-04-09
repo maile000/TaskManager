@@ -108,24 +108,43 @@ exports.changeMemberRole = async (req, res) => {
   const { teamId, userId } = req.params;
   const { newRole } = req.body;
 
-  const allowedRoles = ["Team Lead", "Member"];
+  if (!["Team Lead", "Member"].includes(newRole)) {
+    return res.status(400).json({ error: "Ungültige Rolle" });
+  }
 
   try {
-    const adminCheck = await pool.query(
+    // Check if the requester is a Team Lead
+    const requester = await pool.query(
       "SELECT role FROM team_members WHERE user_id = $1 AND team_id = $2",
       [req.userId, teamId]
     );
 
-    if (adminCheck.rows.length === 0 || adminCheck.rows[0].role !== "Admin") {
-      return res.status(403).json({ error: "Nur Admins können Rollen ändern" });
+    if (requester.rows.length === 0 || requester.rows[0].role !== "Team Lead") {
+      return res.status(403).json({ error: "Nur Team Leads dürfen Rollen ändern" });
     }
 
-    const userCheck = await pool.query(
-      "SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2",
+    if (parseInt(userId) === req.userId) {
+      return res.status(403).json({ error: "Du kannst deine eigene Rolle nicht ändern" });
+    }
+
+    // Wenn alter Team Lead → Prüfen ob noch ein anderer bleibt
+    const target = await pool.query(
+      "SELECT role FROM team_members WHERE user_id = $1 AND team_id = $2",
       [userId, teamId]
     );
-    if (userCheck.rows.length === 0) {
-      return res.status(404).json({ error: "Teammitglied nicht gefunden" });
+
+    if (target.rows.length === 0) {
+      return res.status(404).json({ error: "Mitglied nicht gefunden" });
+    }
+
+    if (target.rows[0].role === "Team Lead" && newRole !== "Team Lead") {
+      const leads = await pool.query(
+        "SELECT COUNT(*) FROM team_members WHERE team_id = $1 AND role = 'Team Lead'",
+        [teamId]
+      );
+      if (parseInt(leads.rows[0].count) <= 1) {
+        return res.status(400).json({ error: "Mindestens ein Team Lead muss vorhanden sein" });
+      }
     }
 
     await pool.query(
@@ -133,11 +152,13 @@ exports.changeMemberRole = async (req, res) => {
       [newRole, userId, teamId]
     );
 
-    res.json({ message: "Rolle erfolgreich geändert" });
+    res.json({ message: "Rolle aktualisiert" });
   } catch (err) {
+    console.error("Fehler bei Rollenänderung:", err);
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 };
+
 
 exports.updateColumnOrder = async (req, res) => {
   const pool = req.app.locals.pool;

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import InviteModal from "../Component/InviteModal";
@@ -10,6 +10,10 @@ function TeamPage() {
   const [team, setTeam] = useState(null);
   const [avatars, setAvatars] = useState({});
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [roleChanges, setRoleChanges] = useState({});
+  const currentUserId = useMemo(() => JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id, []);
+
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -30,7 +34,6 @@ function TeamPage() {
           members: membersResponse.data,
         });
 
-        // Lade Avatare separat für jedes Mitglied
         const avatarFetches = membersResponse.data.map(async (member) => {
           try {
             const res = await fetch(`http://localhost:5000/api/avatar/${member.id}`, {
@@ -67,6 +70,7 @@ function TeamPage() {
       <Sidebar />
       <div className="column team-uebersicht-div">
         <h1>{team.name}</h1>
+       
         <div>
           <button className="button" onClick={() => setIsInviteModalOpen(true)}>
             Mitglieder hinzufügen
@@ -78,30 +82,73 @@ function TeamPage() {
             />
           )}
         </div>
-
+       
         <div>
           {team.members && team.members.length > 0 ? (
             <div className="team-members">
               <h2>Teammitglieder</h2>
               <div className="teammitglied-list">
-                {team.members.map((member) => (
-                  <div key={member.id} className="teammitglied-card">
-                    <div
-                      className="avatar"
-                      dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
-                      style={{ width: "64px", height: "64px" }}
-                    />
-                    <div>
-                      <strong>{member.name}</strong>
-                    </div>
+              {team.members.map((member) => (
+                <div key={member.id} className="teammitglied-card">
+                  <div
+                    className="avatar"
+                    dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
+                    style={{ width: "64px", height: "64px" }}
+                  />
+                  <div><strong>{member.name}</strong></div>
+                  
+                  {editMode && member.id !== currentUserId ? (
+                    <select
+                      value={roleChanges[member.id] || member.role}
+                      onChange={(e) =>
+                        setRoleChanges({ ...roleChanges, [member.id]: e.target.value })
+                      }
+                    >
+                      <option value="Member">Member</option>
+                      <option value="Team Lead">Team Lead</option>
+                    </select>
+                  ) : (
                     <div>{member.role}</div>
-                  </div>
-                ))}
+                  )}
+                </div>
+              ))}
               </div>
             </div>
           ) : (
             <p>Keine Mitglieder gefunden.</p>
           )}
+        </div>
+        <div>
+          <button className="button" onClick={() => setEditMode(!editMode)}>
+            {editMode ? "Abbrechen" : "Rollen bearbeiten"}
+          </button>
+            {editMode && (
+              <button
+                className="button"
+                onClick={async () => {
+                  try {
+                    const token = localStorage.getItem("token");
+                    await Promise.all(
+                      Object.entries(roleChanges).map(([userId, newRole]) =>
+                        axios.put(
+                          `http://localhost:5000/api/teams/${teamId}/members/${userId}/role`,
+                          { newRole },
+                          {
+                            headers: { Authorization: `Bearer ${token}` },
+                          }
+                        )
+                      )
+                    );
+                    window.location.reload(); // alternativ: Team-Daten neu laden
+                  } catch (err) {
+                    console.error("Fehler beim Speichern:", err);
+                    alert("Fehler beim Speichern der Änderungen");
+                  }
+                }}
+              >
+                Speichern
+              </button>
+            )}
         </div>
       </div>
     </div>
