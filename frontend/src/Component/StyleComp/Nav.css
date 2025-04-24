@@ -3,6 +3,11 @@
     gap: 20px;
     padding: 10px;
     background-color: #00033D;
+    height: 60px;
+    line-height: 60px;
+    font-size: 16px;
+    font-weight: 500;
+    text-decoration: none;
     color: white;
     justify-content: space-around;
     align-items: center;

@@ -14,8 +14,15 @@ function TaskCard({ task, onTaskClick , activeTaskId}) {
     opacity: activeTaskId === task.id.toString() ? 0 : 1, 
   };
 
+  const isOverdue = task.deadline && new Date(task.deadline) < new Date() && task.status !== "Done";
+
   return (
-    <div ref={setNodeRef} {...attributes}  style={style} className="task-card">
+    <div 
+      ref={setNodeRef} 
+      {...attributes}  
+      style={style}  
+      className={`task-card ${isOverdue ? "task-overdue" : ""}`}
+      >
       <div {...listeners} style={{ cursor: "grab", padding: "4px", fontSize: "20px" }}>
         ☰
       </div>

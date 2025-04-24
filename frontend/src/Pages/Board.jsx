@@ -168,13 +168,14 @@ function Column({ column, onTaskClick, activeTaskId }) {
     <div ref={setNodeRef} style={style} className="column-div">
       <div ref={setDragRef} {...attributes} {...listeners} className="column-title row">
         <div>{column.title}</div>
-        <div>☰ </div>
       </div>
-      <SortableContext items={column.tasks.map((item) => `task-${item.id}`)} strategy={verticalListSortingStrategy} >
+      <div className="column-body">
+         <SortableContext items={column.tasks.map((item) => `task-${item.id}`)} strategy={verticalListSortingStrategy} >
         {column.tasks.map((task) => (
           <TaskCard key={task.id} task={task} onTaskClick={onTaskClick} activeTaskId={activeTaskId}/>
         ))}
       </SortableContext>
+      </div>
     </div>
   );
 }

@@ -92,7 +92,7 @@ exports.createTask = async (req, res) => {
   exports.updateTask = async (req, res) => {
     const pool = req.app.locals.pool;
     const { teamId, taskId } = req.params;
-    const { title, description, status, points, assigned_to,priority_flag } = req.body;
+    const { title, description, status, points, assigned_to,priority_flag, deadline } = req.body;
     
     const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archived"];
     if (!validStatuses.includes(status)) {
@@ -113,7 +113,7 @@ exports.createTask = async (req, res) => {
   
       const updateQuery = `
         UPDATE tasks 
-        SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5, priority_flag = $8
+        SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5, deadline = $6, priority_flag = $9
         WHERE id = $6 AND team_id = $7
         RETURNING *`;
   
@@ -123,6 +123,7 @@ exports.createTask = async (req, res) => {
         points,
         status,
         assigned_to === "" ? null : assigned_to,
+        deadline || null,
         taskId,
         teamId,
         priority_flag

@@ -10,6 +10,7 @@ import Home from "./Pages/Home";
 import Team from "./Pages/Team";
 import TeamPage from "./Pages/TeamPages";
 import Profil from "./Pages/Profil";
+import TeamRanking from "./Pages/TeamRanking";
 
 function App() {
     const [user, setUser] = useState(false);
@@ -64,6 +65,7 @@ function App() {
                 <Route path="/team/:teamId/dashboard" element={user ? <Board /> : <Navigate to="/login" />} />
                 <Route path="/profile" element={user ? <Profil /> : <Navigate to="/login" />} />
                 <Route path="/team/:teamId" element={user ? <TeamPage /> : <Navigate to="/login" />} />
+                <Route path="/team/:teamId/teamranking" element={user ? <TeamRanking /> : <Navigate to="/login" />} />
                 <Route path="/team" element={user ? <Team /> : <Navigate to="/login" />} />
             </Routes>
         </Router>

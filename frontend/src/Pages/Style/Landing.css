@@ -1,5 +1,5 @@
 .landing{
-    background-color: #977DFF;
+    background: linear-gradient(to bottom ,#977DFF, #00033D);
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -34,7 +34,6 @@
     align-items: center;
     height: 100vh;
     width: 100vw;
-    background: linear-gradient(to bottom ,#977DFF, #00033D);
     justify-content: space-evenly;
 }
 
@@ -73,4 +72,14 @@
     transform: scale(0.8);
     opacity: 0.6;
 }
-  
+
+.fade-in {
+    opacity: 0;
+    transform: translateY(60px);
+    transition: opacity 1.2s ease-out, transform 1.2s ease-out;
+}
+
+.fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
+}

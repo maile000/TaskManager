@@ -91,10 +91,13 @@ exports.getTeamMembers = async (req, res) => {
 
   try {
     const members = await pool.query(
-      `SELECT u.id, u.name, u.email, tm.role 
-       FROM team_members tm
-       JOIN users u ON tm.user_id = u.id
-       WHERE tm.team_id = $1`,
+      `SELECT u.id, u.name, u.email, tm.role,
+        COALESCE(SUM(t.points), 0) as points
+      FROM team_members tm
+      JOIN users u ON tm.user_id = u.id
+      LEFT JOIN tasks t ON t.assigned_to = u.id AND t.team_id = tm.team_id
+      WHERE tm.team_id = $1
+      GROUP BY u.id, tm.role`,
       [teamId]
     );
     res.json(members.rows);

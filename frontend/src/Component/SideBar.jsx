@@ -42,7 +42,7 @@ const Sidebar = ({ defaultOpen = true }) => {
           <h1>{teamName}</h1>
           <nav className="sidebar-nav">
             <Link className="sidebar-link" to={`/team/${teamId}/dashboard`}>Board</Link>
-            <Link className="sidebar-link" to="">Ranking</Link>
+            <Link className="sidebar-link" to={`/team/${teamId}/teamranking`}>Ranking</Link>
             <Link className="sidebar-link" to={`/team/${teamId}`}>Team</Link>
           </nav>
         </div>

@@ -1,5 +1,7 @@
 .profil-page{
-    justify-content: var();
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
 
 .profil-head{

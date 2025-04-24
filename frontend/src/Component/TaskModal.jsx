@@ -12,6 +12,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
   const [assignedTo, setAssignedTo] = useState("");
   const [teamMembers, setTeamMembers] = useState([]);
   const [priority_flag, setFlag] = useState("");
+  const [deadline, setDeadline] = useState("");
+
 
   const pointsByStatus = {
     "Planning": 100,
@@ -28,6 +30,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       setStatus(task.status || "To Do");
       setAssignedTo(task.assigned_to || "");
       setFlag(task.priority_flag || "Low");
+      setDeadline(task.deadline ? task.deadline.split("T")[0] : "");
     }
   }, [task]);
 
@@ -62,6 +65,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
         assigned_to: assignedTo,
         points: pointsByStatus[status] || 0,
         priority_flag,
+        deadline,
       };
 
       await axios.put(
@@ -81,8 +85,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
   };
 
   return (
-    <div className="overlayStyleCard">
-      <div className="modalStyleCard">
+    <div className="overlayStyleCard" onClick={onClose}>
+      <div className="modalStyleCard" onClick={(e) => e.stopPropagation()}>
         <div className="row task-head">
           <h2>Task</h2>
           <button onClick={() => setIsEditing(!isEditing)} className="button">
@@ -126,7 +130,13 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
             <option value="Critical">Critical</option>
           </select>
         ) : (
-          <p>{priority_flag}</p>
+          <div style={{ display: "flex", alignItems: "center" }}>
+            <span
+              className={`flag-indicator flag-${priority_flag.toLowerCase()}`}
+              data-flag={priority_flag}
+            />
+            <span>{priority_flag}</span>
+          </div>
         )}
 
         <label><strong>Assigned To:</strong></label>
@@ -147,6 +157,16 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
             }
           </p>
         )}
+        <label><strong>Deadline:</strong></label>
+          {isEditing ? (
+            <input
+              type="date"
+              value={deadline}
+              onChange={(e) => setDeadline(e.target.value)}
+            />
+          ) : (
+            <p>{deadline ? new Date(deadline).toLocaleDateString() : "Keine Deadline"}</p>
+          )}
         <p><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
         <p><strong>Punkte (automatisch):</strong> {pointsByStatus[status]}</p>
 
