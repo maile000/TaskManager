@@ -113,8 +113,14 @@ exports.createTask = async (req, res) => {
   
       const updateQuery = `
         UPDATE tasks 
-        SET title = $1, description = $2, points = $3, status = $4, assigned_to = $5, deadline = $6, priority_flag = $9
-        WHERE id = $6 AND team_id = $7
+          SET title = $1, 
+          description = $2, 
+          points = $3,
+          status = $4, 
+          assigned_to = $5, 
+          deadline = $6, 
+          priority_flag = $7
+        WHERE id = $8 AND team_id = $9
         RETURNING *`;
   
       const updateValues = [
@@ -124,9 +130,9 @@ exports.createTask = async (req, res) => {
         status,
         assigned_to === "" ? null : assigned_to,
         deadline || null,
+        priority_flag,
         taskId,
-        teamId,
-        priority_flag
+        teamId
       ];
   
       console.log("🧾 Query-Parameter:", updateValues);

@@ -41,7 +41,7 @@ function AvatarOptionen({ onAvatarSelected }) {
   }, []);
 
   const handleSelect = async (avatar, index) => {
-    setClickedIndex(index); // 🟢 Animation starten
+    setClickedIndex(index);
 
     const res = await fetch('http://localhost:5000/api/avatar', {
       method: 'POST',
@@ -59,7 +59,7 @@ function AvatarOptionen({ onAvatarSelected }) {
     if (res.ok && typeof onAvatarSelected === 'function') {
       setTimeout(() => {
         onAvatarSelected();
-      }, 600); // nach Animation
+      }, 600);
     }
   };
 

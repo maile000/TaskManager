@@ -122,8 +122,6 @@ const handleDragEnd = async (event) => {
   return (
     <div className="board-background">
       <Sidebar defaultOpen={false} />
-      <div className="row">
-        <div style={{width:"100px", height:"auto"}}></div>
         <div>
           <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
             Task erstellen
@@ -145,9 +143,6 @@ const handleDragEnd = async (event) => {
             </DragOverlay>
           </DndContext>
         </div>
-      </div>
-     
-
       <TaskModal key={selectedTask?.id || "new"}  isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} refreshTaskList={fetchTasks} />
     </div>
   );

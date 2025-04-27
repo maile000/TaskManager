@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./Style/TeamPages.css";
+import "./Style/TeamRanking.css";
 import Sidebar from "../Component/SideBar";
 
 function TeamPage() {
@@ -67,22 +68,58 @@ function TeamPage() {
         <div>
         {team.members && team.members.length > 0 ? (
             <div className="team-members">
-              <h2>Teammitglieder</h2>
-              <div className="teammitglied-list">
-              {[...team.members]
-                .sort((a, b) => b.points - a.points)
-                .map((member, index) => (
-                <div key={member.id} className="teammitglied-card">
-                  <div
-                    className="avatar"
-                    dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
-                    style={{ width: "64px", height: "64px" }}
-                  />
-                  <div><strong>{member.name}</strong></div>
-                  <div><strong>#{index + 1}</strong> – {member.points} Punkte</div>
-
+              <h2>Ranking</h2>
+              <div className="podium-list">
+                <div className="podium-top3">
+                  {[...team.members]
+                    .sort((a, b) => b.points - a.points)
+                    .slice(0, 3)
+                    .map((member, index) => (
+                      <div key={member.id}>
+                        <div
+                          className="podium-item"
+                          style={{
+                            backgroundColor: 
+                              index === 0 ? '#ffd700' :
+                              index === 1 ? '#c0c0c0' :
+                              index === 2 ? '#cd7f32' :
+                              '#f0f0f0',
+                            height:
+                              index === 0 ? '220px' :
+                              index === 1 ? '180px' :
+                              index === 2 ? '140px' :
+                              'auto'
+                          }}
+                        >
+                          <div
+                            className="avatar"
+                            dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
+                            style={{ width: "64px", height: "64px" }}
+                          />
+                          <div className="podium-rank">#{index + 1}</div>
+                        </div>
+                        <div className="podium-name"><strong>{member.name}</strong></div>
+                        <div>{member.points} Punkte</div>
+                      </div>
+                    ))}
                 </div>
-              ))}
+                  {[...team.members]
+                    .sort((a, b) => b.points - a.points)
+                    .slice(3)
+                    .map((member, index) => (
+                      <div key={member.id} >
+                        <div className="podium-item-2">
+                           <div
+                            className="avatar"
+                            dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
+                            style={{ width: "64px", height: "64px" }}
+                          />
+                          <div className="podium-rank">#{index + 4}</div> 
+                        </div>
+                        <div className="podium-name"><strong>{member.name}</strong></div>
+                        <div>{member.points} Punkte</div>
+                      </div>
+                    ))}
               </div>
             </div>
           ) : (

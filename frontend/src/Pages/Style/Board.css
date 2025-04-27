@@ -1,8 +1,9 @@
 .board-background{
     background: linear-gradient(to bottom ,#977DFF, #00033D);
     height: 100vh;
-    width: 100vw;
     display: flex;
+    justify-content: flex-end;
+    padding-right: 25px;
 } 
 
 .board-box{

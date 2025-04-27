@@ -23,6 +23,13 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
     "Archived": 0
   };
 
+  const pointsByFlag = {
+    "Low": 10,
+    "Medium": 30,
+    "High": 50,
+    "Critical": 100
+  };
+
   useEffect(() => {
     if (task) {
       setTitle(task.title || "");
@@ -63,7 +70,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
         description,
         status,
         assigned_to: assignedTo,
-        points: pointsByStatus[status] || 0,
+        points: (pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0),
         priority_flag,
         deadline,
       };
@@ -107,8 +114,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
         ) : (
           <p>{description}</p>
         )}
-
-        <label><strong>Status:</strong></label>
+        <div className=" row">
+          <label><strong>Status:</strong></label>
         {isEditing ? (
           <select value={status} onChange={(e) => setStatus(e.target.value)}>
             <option value="Planning">Planning</option>
@@ -120,6 +127,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
         ) : (
           <p>{status}</p>
         )}
+        </div>
+        
 
         <label><strong>flag:</strong></label>
         {isEditing ? (
@@ -168,8 +177,10 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
             <p>{deadline ? new Date(deadline).toLocaleDateString() : "Keine Deadline"}</p>
           )}
         <p><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
-        <p><strong>Punkte (automatisch):</strong> {pointsByStatus[status]}</p>
-
+        <p> 
+          <strong>Punkte:</strong>{" "}
+          {(pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0)}
+        </p>
         {isEditing && (
           <button onClick={handleSaveChanges} className="saveButtonStyleCard">Speichern</button>
         )}
