@@ -1,5 +1,6 @@
 import "./Style/Home.css";
 import React from "react";
+import StatusPie from "../Component/StatusPie";
 
 function Home () {
 
@@ -17,7 +18,7 @@ function Home () {
 
                 </div>
                 <div className="item item2">2
-
+                    <StatusPie/>
                 </div>
                 <div className="item item3">
                     <div style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center", color: "white" }}>

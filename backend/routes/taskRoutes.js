@@ -7,7 +7,8 @@ const {
   getSingleTask,
   updateTask,
   updateTaskStatus,
-  updateTaskPosition
+  updateTaskPosition,
+  getUserTasks
 } = require("../controllers/taskController");
 
 router.post("/teams/:teamId/tasks", authenticate, createTask);
@@ -16,5 +17,7 @@ router.get("/teams/:teamId/tasks/:taskId", authenticate, getSingleTask);
 router.put("/teams/:teamId/tasks/:taskId", authenticate, updateTask);
 router.put("/tasks/:taskId/status", authenticate, updateTaskStatus);
 router.put("/tasks/:taskId/position", authenticate, updateTaskPosition);
+router.get("/user/tasks", authenticate, getUserTasks);
+
 
 module.exports = router;

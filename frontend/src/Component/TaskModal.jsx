@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, forwardRef } from "react";
 import { useParams } from "react-router-dom";
 import axios from "axios";
 import "./StyleComp/TaskCard.css";
 
-const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
+const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComment , ...props }, ref)  => {
   const { teamId } = useParams();
   const [isEditing, setIsEditing] = useState(false);
   const [title, setTitle] = useState("");
@@ -13,7 +13,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
   const [teamMembers, setTeamMembers] = useState([]);
   const [priority_flag, setFlag] = useState("");
   const [deadline, setDeadline] = useState("");
-
+  const [projects, setProjects] = useState([]);
+  const [projectId, setProjectId] = useState(null);  
 
   const pointsByStatus = {
     "Planning": 100,
@@ -38,12 +39,13 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       setAssignedTo(task.assigned_to || "");
       setFlag(task.priority_flag || "Low");
       setDeadline(task.deadline ? task.deadline.split("T")[0] : "");
+      setProjectId(task.project_id || null);
     }
   }, [task]);
-
+  
   useEffect(() => {
-    if (!teamId) return;
     const fetchMembers = async () => {
+      if (!teamId) return;
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
@@ -56,11 +58,27 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
     };
     fetchMembers();
   }, [teamId]);
-
+  
+  useEffect(() => {
+    const fetchProjects = async () => {
+      if (!isEditing) return;
+      try {
+        const token = localStorage.getItem("token");
+        const res = await axios.get(`http://localhost:5000/api/teams/${teamId}/projects`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setProjects(res.data.projects || []);
+      } catch (err) {
+        console.error("❌ Fehler beim Laden der Projekte:", err);
+      }
+    };
+    fetchProjects();
+  }, [isEditing, teamId]);
+  
   if (!isOpen || !task) {
     return null;
   }
-
+  
   const handleSaveChanges = async () => {
     try {
       const token = localStorage.getItem("token");
@@ -73,6 +91,7 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
         points: (pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0),
         priority_flag,
         deadline,
+        project_id: projectId,
       };
 
       await axios.put(
@@ -90,6 +109,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       console.error("❌ Fehler beim Aktualisieren der Task:", error);
     }
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="overlayStyleCard" onClick={onClose}>
@@ -128,7 +149,6 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
           <p>{status}</p>
         )}
         </div>
-        
 
         <label><strong>flag:</strong></label>
         {isEditing ? (
@@ -166,6 +186,36 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
             }
           </p>
         )}
+        <label><strong>Projekt:</strong></label>
+          {isEditing ? (
+            <>
+              {projects.length > 0 ? (
+                <select value={projectId || ""} onChange={(e) => setProjectId(e.target.value || null)}>
+                  <option value="">-- Kein Projekt --</option>
+                  {projects.map((proj) => (
+                    <option key={proj.id} value={proj.id}>
+                      {proj.name}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <div>
+                  <button
+                    className="button"
+                    onClick={() => {
+                      
+                    }}
+                  >
+                    ➕ Projekt erstellen
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
+            <p>
+              {task.project_name || "Kein Projekt zugewiesen"}
+            </p>
+          )}
         <label><strong>Deadline:</strong></label>
           {isEditing ? (
             <input
@@ -181,6 +231,8 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
           <strong>Punkte:</strong>{" "}
           {(pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0)}
         </p>
+        <button className="button" onClick={openComment}>Kommentar</button>
+        
         {isEditing && (
           <button onClick={handleSaveChanges} className="saveButtonStyleCard">Speichern</button>
         )}
@@ -189,6 +241,6 @@ const TaskModal = ({ isOpen, onClose, task, refreshTaskList }) => {
       </div>
     </div>
   );
-};
+});
 
 export default TaskModal;

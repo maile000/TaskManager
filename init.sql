@@ -36,7 +36,7 @@ CREATE TABLE tasks (
     assigned_to INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW(),
     deadline TIMESTAMP,
-    priority_flag VARCHAR(20) CHECK (priority_flag IN ('Low', 'Medium', 'High', 'Critical')) NOT NULL DEFAULT 'Medium';
+    priority_flag VARCHAR(20) CHECK (priority_flag IN ('Low', 'Medium', 'High', 'Critical')) NOT NULL DEFAULT 'Medium'
 );
 
 CREATE TABLE team_points (
@@ -53,4 +53,20 @@ CREATE TABLE gamification_rewards (
     reward_name VARCHAR(100) NOT NULL,
     points INTEGER DEFAULT 0,
     achieved_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE projects (
+    id SERIAL PRIMARY KEY,
+    team_id INT REFERENCES teams(id) ON DELETE CASCADE,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    created_at TIMESTAMP DEFAULT NOW()
+);
+
+CREATE TABLE task_comments (
+    id SERIAL PRIMARY KEY,
+    task_id INT REFERENCES tasks(id) ON DELETE CASCADE,
+    user_id INT REFERENCES users(id) ON DELETE SET NULL,
+    comment_text TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT NOW()
 );

@@ -1,7 +1,7 @@
 exports.createTask = async (req, res) => {
     const pool = req.app.locals.pool;
     const { teamId } = req.params;
-    const { title, description, assignedTo, deadline ,priority_flag} = req.body;
+    const { title, description, assignedTo, deadline ,priority_flag, project_id} = req.body;
     const userId = req.userId;
   
     if (!title) {
@@ -18,9 +18,9 @@ exports.createTask = async (req, res) => {
       }
   
       const newTask = await pool.query(
-        `INSERT INTO tasks (team_id, title, description, assigned_to, deadline, status,priority_flag)
-         VALUES ($1, $2, $3, $4, $5, 'To Do', $6) RETURNING *`,
-        [teamId, title, description, assignedTo || null, deadline || null, priority_flag || null]
+        `INSERT INTO tasks (team_id, title, description, assigned_to, deadline, status,priority_flag, project_id)
+         VALUES ($1, $2, $3, $4, $5, 'To Do', $6, $7) RETURNING *`,
+        [teamId, title, description, assignedTo || null, deadline || null, priority_flag || null, project_id || null]
       );
   
       res.json({ message: "Task erfolgreich erstellt", task: newTask.rows[0] });
@@ -92,7 +92,7 @@ exports.createTask = async (req, res) => {
   exports.updateTask = async (req, res) => {
     const pool = req.app.locals.pool;
     const { teamId, taskId } = req.params;
-    const { title, description, status, points, assigned_to,priority_flag, deadline } = req.body;
+    const { title, description, status, points, assigned_to,priority_flag, deadline, project_id } = req.body;
     
     const validStatuses = ["To Do", "Planning", "In Progress", "Done", "Archived"];
     if (!validStatuses.includes(status)) {
@@ -119,8 +119,9 @@ exports.createTask = async (req, res) => {
           status = $4, 
           assigned_to = $5, 
           deadline = $6, 
-          priority_flag = $7
-        WHERE id = $8 AND team_id = $9
+          priority_flag = $7,
+          project_id = $8
+        WHERE id = $9 AND team_id = $10
         RETURNING *`;
   
       const updateValues = [
@@ -131,6 +132,7 @@ exports.createTask = async (req, res) => {
         assigned_to === "" ? null : assigned_to,
         deadline || null,
         priority_flag,
+        project_id === "" ? null : project_id,
         taskId,
         teamId
       ];
@@ -196,5 +198,36 @@ exports.createTask = async (req, res) => {
     } catch (error) {
       res.status(500).json({ error: "Database error" });
     }
+  };
+  
+  exports.getUserTasks = async (req, res) => {
+    const pool = req.app.locals.pool;
+  const userId = req.userId;
+
+  try {
+    // 1. Team-Mitgliedschaften holen
+    const teamsRes = await pool.query(
+      `SELECT team_id FROM team_members WHERE user_id = $1`,
+      [userId]
+    );
+
+    const teamIds = teamsRes.rows.map((row) => row.team_id);
+
+    if (teamIds.length === 0) {
+      return res.json({ tasks: [] });
+    }
+
+    // 2. Tasks abrufen, bei denen der User assigned ist und im Team Mitglied
+    const tasksRes = await pool.query(
+      `SELECT * FROM tasks
+       WHERE assigned_to = $1 AND team_id = ANY($2::int[])`,
+      [userId, teamIds]
+    );
+
+    res.json({ tasks: tasksRes.rows });
+  } catch (err) {
+    console.error("❌ Fehler bei getUserTasksAcrossTeams:", err);
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
   };
   

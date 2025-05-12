@@ -9,6 +9,7 @@ import {SortableContext, useSortable, verticalListSortingStrategy} from "@dnd-ki
 import { CSS } from "@dnd-kit/utilities";
 import TaskCard from "../Component/TaskCard";
 import TaskModal from "../Component/TaskModal";
+import CommentModal from "../Component/CommentModal";
 
 const statuses = ["Planning", "To Do", "In Progress", "Done"];
 
@@ -19,7 +20,29 @@ function Board() {
   const [selectedTask, setSelectedTask] = useState(null);
   const userId = JSON.parse(localStorage.getItem("user"))?.id;
   const [activeTask, setActiveTask] = useState(null);
+  const [isCommentOpen, setCommentOpen] = useState(false);
+  const taskModalRef = useRef(null);
+  const commentModalRef = useRef(null);
 
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        taskModalRef.current &&
+        !taskModalRef.current.contains(event.target) &&
+        commentModalRef.current &&
+        !commentModalRef.current.contains(event.target)
+      ) {
+        setSelectedTask(null);
+        setCommentOpen(false);
+      }
+    };
+  
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+  
   useEffect(() => {
     fetchTasks();
   }, [teamId]);
@@ -51,6 +74,16 @@ function Board() {
       prev.map((col) => (col.id === newTask.status ? { ...col, tasks: [...col.tasks, newTask] } : col))
     );
   };
+
+  const handleCloseTaskModal = () => {
+    setSelectedTask(null);
+    setCommentOpen(false);
+  };
+  
+  const handleCloseCommentModal = () => {
+    setCommentOpen(false);
+  };
+  
   
   const handleDragStart = (event) => {
     const { active } = event;
@@ -143,7 +176,23 @@ const handleDragEnd = async (event) => {
             </DragOverlay>
           </DndContext>
         </div>
-      <TaskModal key={selectedTask?.id || "new"}  isOpen={!!selectedTask} onClose={() => setSelectedTask(null)} task={selectedTask} refreshTaskList={fetchTasks} />
+        <TaskModal 
+          key={selectedTask?.id || "new"}  
+          ref={taskModalRef}
+          isOpen={!!selectedTask} 
+          onClose={handleCloseTaskModal}
+          task={selectedTask} 
+          refreshTaskList={fetchTasks} 
+          openComment={() => setCommentOpen(true)} 
+        />
+
+        {isCommentOpen && selectedTask && (
+          <CommentModal
+            ref={commentModalRef} 
+            taskId={selectedTask.id}
+            onClose={handleCloseCommentModal}
+          />
+        )}
     </div>
   );
 }
