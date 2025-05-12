@@ -1,0 +1,14 @@
+.modal-style-comment {
+    position: fixed;
+    top: 10%;
+    left: 70%;
+    z-index: 1000;
+    background: linear-gradient(to bottom, #0033FF, #00033D);
+    color: #FFCCF2;
+    padding: 1rem;
+    border-radius: 8px;
+    width: 25%;
+    max-height: 80%;
+    overflow-y: auto;
+    box-shadow: 0 0 10px rgba(0,0,0,0.3);
+}

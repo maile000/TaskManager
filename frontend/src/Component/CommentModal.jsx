@@ -1,6 +1,7 @@
 import axios from "axios";
 import React, { useState, useEffect, forwardRef } from "react";
-import "./StyleComp/Modal.css";
+import "./StyleComp/Comment.css";
+import { useParams } from "react-router-dom";
 
 const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {    
     const [comments, setComments] = useState([]);
@@ -8,7 +9,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
     const [editingCommentId, setEditingCommentId] = useState(null);
     const [editedText, setEditedText] = useState("");
     const [userId, setUserId] = useState(null);
-
+    const { teamId } = useParams();
     const token = localStorage.getItem("token");
 
     useEffect(() => {
@@ -19,7 +20,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
 
     const fetchComments = async () => {
         try {
-            const response = await axios.get(`http://localhost:5000/api/tasks/${taskId}/comments`, {
+            const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/tasks/${taskId}/comments`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
             setComments(response.data.comments);
@@ -32,7 +33,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
         e.preventDefault();
         try {
             await axios.post(
-                `http://localhost:5000/api/tasks/${taskId}/comments`,
+                `http://localhost:5000/api/teams/${teamId}/tasks/${taskId}/comments`,
                 { comment_text: newComment },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -46,7 +47,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
     const handleEdit = async (commentId) => {
         try {
             await axios.put(
-                `http://localhost:5000/api/comments/${commentId}`,
+                `http://localhost:5000/api/teams/${teamId}/comments/${commentId}`,
                 { comment_text: editedText },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -89,7 +90,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
                                     <button onClick={() => setEditingCommentId(null)}>Abbrechen</button>
                                 </>
                             ) : (
-                                <p>{comment.comment_text}</p>
+                                <p style={{ whiteSpace: "pre-wrap" }}>{comment.comment_text}</p>
                             )}
 
                             {comment.user_id === userId && editingCommentId !== comment.id && (

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "./Style/Board.css";
 import Sidebar from "../Component/SideBar";
 import AddTask from "../Component/CreatTaskModal";
@@ -26,12 +26,12 @@ function Board() {
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (
-        taskModalRef.current &&
-        !taskModalRef.current.contains(event.target) &&
-        commentModalRef.current &&
-        !commentModalRef.current.contains(event.target)
-      ) {
+      const isOutsideTask =
+        taskModalRef.current && !taskModalRef.current.contains(event.target);
+      const isOutsideComment =
+        commentModalRef.current && !commentModalRef.current.contains(event.target);
+  
+      if (isOutsideTask && (!isCommentOpen || isOutsideComment)) {
         setSelectedTask(null);
         setCommentOpen(false);
       }
@@ -41,7 +41,8 @@ function Board() {
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [isCommentOpen]);
+  
   
   useEffect(() => {
     fetchTasks();
@@ -185,14 +186,14 @@ const handleDragEnd = async (event) => {
           refreshTaskList={fetchTasks} 
           openComment={() => setCommentOpen(true)} 
         />
-
         {isCommentOpen && selectedTask && (
           <CommentModal
-            ref={commentModalRef} 
+            ref={commentModalRef}
             taskId={selectedTask.id}
             onClose={handleCloseCommentModal}
           />
         )}
+
     </div>
   );
 }

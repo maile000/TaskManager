@@ -21,5 +21,4 @@ router.put("/teams/:teamId/members/:userId/role", authenticate, changeMemberRole
 router.put("/teams/:teamId/column-order", authenticate, updateColumnOrder);
 router.post("/join-team", authenticate, joinTeam);
 
-
 module.exports = router;
