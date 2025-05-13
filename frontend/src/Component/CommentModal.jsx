@@ -69,9 +69,11 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
     return (
         <div>
             <div ref={ref} className="modal-style-comment">
+            <div className="modalClose">
+                <button onClick={onClose} className="close-btn"></button>
+            </div>
                 <h2>Kommentare</h2>
 
-                {/* Kommentar-Liste */}
                 <div className="comment-list">
                     {comments.map((comment) => (
                         <div key={comment.id} className="comment-item">
@@ -98,7 +100,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
                                     setEditingCommentId(comment.id);
                                     setEditedText(comment.comment_text);
                                 }}>
-                                    Bearbeiten
+                                    ✏️
                                 </button>
                             )}
                         </div>
@@ -113,8 +115,7 @@ const CommentModal = forwardRef(({ taskId, onClose, onCreate }, ref) => {
                         required
                     />
                     <div className="modal-actions">
-                        <button type="button" onClick={onClose}>Schließen</button>
-                        <button type="submit">Speichern</button>
+                        <button className="button" type="submit">Speichern</button>
                     </div>
                 </form>
             </div>

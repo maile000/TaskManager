@@ -11,6 +11,7 @@ import Team from "./Pages/Team";
 import TeamPage from "./Pages/TeamPages";
 import Profil from "./Pages/Profil";
 import TeamRanking from "./Pages/TeamRanking";
+import Footer from "./Component/Footer";
 
 function App() {
     const [user, setUser] = useState(false);
@@ -68,6 +69,7 @@ function App() {
                 <Route path="/team/:teamId/teamranking" element={user ? <TeamRanking /> : <Navigate to="/login" />} />
                 <Route path="/team" element={user ? <Team /> : <Navigate to="/login" />} />
             </Routes>
+            <Footer/>
         </Router>
     );
 }

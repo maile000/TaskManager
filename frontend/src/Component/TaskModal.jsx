@@ -115,32 +115,41 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
   return (
     <div className="overlayStyleCard" onClick={onClose}>
       <div className="modalStyleCard" onClick={(e) => e.stopPropagation()}>
+        <div className="modalClose">
+          <button onClick={onClose} className="close-btn"></button>
+        </div>
         <div className="column">
           <div className="row  task-head">
-            <h2>Task</h2>
+            <div >
+            
+              {isEditing ? (
+                <div>
+                   <label><strong>Titel:</strong></label>
+                  <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
+                </div>
+              ) : (
+                <h1>{title}</h1>
+              )}
+          </div>
             <button onClick={() => setIsEditing(!isEditing)} className="button">
               ✏️ Bearbeiten
             </button>
           </div>
-          <div >
-             <label><strong>Titel:</strong></label>
-          {isEditing ? (
-            <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
-          ) : (
-            <p>{title}</p>
-          )}
-          </div>
+          
          
         </div>
         <div className="task-inhalt">
-          <label><strong>Beschreibung:</strong></label>
+          <label style={{ width: '100px' }}><strong>Beschreibung:</strong></label>
           {isEditing ? (
-            <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+            <textarea 
+              value={description} 
+              onChange={(e) => setDescription(e.target.value)}
+              style={{ whiteSpace: 'pre-wrap' }} />
           ) : (
-            <p>{description}</p>
+            <p style={{ whiteSpace: 'pre-line' }}>{description}</p>
           )}
-          <div className=" row">
-            <label><strong>Status:</strong></label>
+          <div className="label-task">
+            <label style={{ width: '100px' }}><strong>Status:</strong></label>
           {isEditing ? (
             <select value={status} onChange={(e) => setStatus(e.target.value)}>
               <option value="Planning">Planning</option>
@@ -153,85 +162,93 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
             <p>{status}</p>
           )}
           </div>
-
-          <label><strong>flag:</strong></label>
-          {isEditing ? (
-            <select value={priority_flag} onChange={(e) => setFlag(e.target.value)}>
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
-            </select>
-          ) : (
-            <div style={{ display: "flex", alignItems: "center" }}>
-              <span
-                className={`flag-indicator flag-${priority_flag.toLowerCase()}`}
-                data-flag={priority_flag}
-              />
-              <span>{priority_flag}</span>
-            </div>
-          )}
-
-          <label><strong>Assigned To:</strong></label>
-          {isEditing ? (
-            <select value={assignedTo || ""} onChange={(e) => setAssignedTo(e.target.value)}>
-              <option value="">-- Nicht zugewiesen --</option>
-              {teamMembers.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
-          ) : (
-            <p>
-              {
-                teamMembers.find((m) => m.id === task.assigned_to)?.name
-                || "Nicht zugewiesen"
-              }
-            </p>
-          )}
-          <label><strong>Projekt:</strong></label>
+          <div className="label-task">
+            <label style={{ width: '100px' }}><strong>flag:</strong></label>
             {isEditing ? (
-              <>
-                {projects.length > 0 ? (
-                  <select value={projectId || ""} onChange={(e) => setProjectId(e.target.value || null)}>
-                    <option value="">-- Kein Projekt --</option>
-                    {projects.map((proj) => (
-                      <option key={proj.id} value={proj.id}>
-                        {proj.name}
-                      </option>
-                    ))}
-                  </select>
-                ) : (
-                  <div>
-                    <button
-                      className="button"
-                      onClick={() => {
-                        
-                      }}
-                    >
-                      ➕ Projekt erstellen
-                    </button>
-                  </div>
-                )}
-              </>
+              <select value={priority_flag} onChange={(e) => setFlag(e.target.value)}>
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center" }}>
+                <span
+                  className={`flag-indicator flag-${priority_flag.toLowerCase()}`}
+                  data-flag={priority_flag}
+                />
+                <span>{priority_flag}</span>
+              </div>
+            )}
+          </div>
+          <div className="label-task">
+            <label style={{ width: '100px' }}><strong>Assigned To:</strong></label>
+            {isEditing ? (
+              <select value={assignedTo || ""} onChange={(e) => setAssignedTo(e.target.value)}>
+                <option value="">-- Nicht zugewiesen --</option>
+                {teamMembers.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
             ) : (
               <p>
-                {task.project_name || "Kein Projekt zugewiesen"}
+                {
+                  teamMembers.find((m) => m.id === task.assigned_to)?.name
+                  || "Nicht zugewiesen"
+                }
               </p>
             )}
-          <label><strong>Deadline:</strong></label>
-            {isEditing ? (
-              <input
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-              />
-            ) : (
-              <p>{deadline ? new Date(deadline).toLocaleDateString() : "Keine Deadline"}</p>
-            )}
-          <p><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
-          <p> 
+          </div>
+          <div className="label-task">
+
+            <label style={{ width: '100px' }}><strong>Projekt:</strong></label>
+              {isEditing ? (
+                <>
+                <br/>
+                  {projects.length > 0 ? (
+                    <select value={projectId || ""} onChange={(e) => setProjectId(e.target.value || null)}>
+                      <option value="">-- Kein Projekt --</option>
+                      {projects.map((proj) => (
+                        <option key={proj.id} value={proj.id}>
+                          {proj.name}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <div>
+                      <button
+                        className="button"
+                        onClick={() => {
+                          
+                        }}
+                      >
+                        ➕ Projekt erstellen
+                      </button>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <p>
+                  {task.project_name || "Kein Projekt zugewiesen"}
+                </p>
+              )}
+            </div>
+            <div className="label-task">
+              <label style={{ width: '100px' }}><strong>Deadline:</strong></label>
+                {isEditing ? (
+                  <input
+                    type="date"
+                    value={deadline}
+                    onChange={(e) => setDeadline(e.target.value)}
+                  />
+                ) : (
+                  <p>{deadline ? new Date(deadline).toLocaleDateString() : "Keine Deadline"}</p>
+                )}
+              </div>
+          <p ><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
+          <p > 
             <strong>Punkte:</strong>{" "}
             {(pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0)}
           </p>
@@ -241,8 +258,6 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
         {isEditing && (
           <button onClick={handleSaveChanges} className="saveButtonStyleCard">Speichern</button>
         )}
-
-        <button onClick={onClose} className="button">Schließen</button>
       </div>
     </div>
   );

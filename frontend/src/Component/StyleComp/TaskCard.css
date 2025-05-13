@@ -127,3 +127,9 @@
     box-sizing: border-box;
   }
 }
+
+.label-task{
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}

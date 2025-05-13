@@ -217,7 +217,6 @@ exports.createTask = async (req, res) => {
       return res.json({ tasks: [] });
     }
 
-    // 2. Tasks abrufen, bei denen der User assigned ist und im Team Mitglied
     const tasksRes = await pool.query(
       `SELECT * FROM tasks
        WHERE assigned_to = $1 AND team_id = ANY($2::int[])`,
@@ -231,3 +230,33 @@ exports.createTask = async (req, res) => {
   }
   };
   
+exports.getTeamProjects = async (req, res) => {
+  const pool = req.app.locals.pool;
+  const { teamId } = req.params;
+
+  try {
+    const projects = await pool.query(
+      "SELECT id, name FROM projects WHERE team_id = $1",
+      [teamId]
+    );
+    res.json(projects.rows);
+  } catch (err) {
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
+};
+
+exports.postTeamProject = async (req, res) => {
+  const pool = req.app.locals.pool;
+  const { teamId } = req.params;
+  const { name } = req.body;
+
+  try {
+    const newProject = await pool.query(
+      "INSERT INTO projects (team_id, name) VALUES ($1, $2) RETURNING *",
+      [teamId, name]
+    );
+    res.json(newProject.rows[0]);
+  } catch (err) {
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
+};
