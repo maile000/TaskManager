@@ -71,8 +71,56 @@
     flex-direction: column;
     align-items: center;
     cursor: pointer;
+}
+  
+.task-card:hover{
+    border: 2px solid #0033FF;
+}
+
+.filter-select {
+    padding: 8px 12px;
+    background-color: 0600AB;
+    min-width: 180px;
+    font-size: 14px;
+    margin-right: 10px;
+ }
+  
+.filter-select:focus {
+    outline: none;
+    border-color: #646cff;
+}
+
+.collapsible-wrapper {
+    position: relative;
   }
   
-  .task-card:hover{
-    border: 2px solid #0033FF;
+  .toggle-btn {
+    display: inline-block;
+    margin-bottom: 0.5rem;
+    padding: 0.3rem 0.8rem;
+    background: #0033FF;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
   }
+  
+  .collapse-container {
+    overflow: hidden;
+    display: flex;
+    overflow: hidden;
+    white-space: nowrap;
+    max-width: 0;
+    transition: max-width 1s ease, padding 0.4s ease;
+  }
+  
+  .collapse-container.open {
+    max-width: 800px;
+  }
+  
+  .collapse-container select {
+    display: inline-block;
+    margin-right: 0.5rem;
+    vertical-align: middle;
+  }
+  

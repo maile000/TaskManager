@@ -36,7 +36,8 @@ CREATE TABLE tasks (
     assigned_to INT REFERENCES users(id),
     created_at TIMESTAMP DEFAULT NOW(),
     deadline TIMESTAMP,
-    priority_flag VARCHAR(20) CHECK (priority_flag IN ('Low', 'Medium', 'High', 'Critical')) NOT NULL DEFAULT 'Medium'
+    priority_flag VARCHAR(20) CHECK (priority_flag IN ('Low', 'Medium', 'High', 'Critical')) NOT NULL DEFAULT 'Medium',
+    project_id INT REFERENCES projects(id) ON DELETE CASCADE,
 );
 
 CREATE TABLE team_points (

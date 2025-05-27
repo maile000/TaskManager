@@ -39,7 +39,9 @@
 
 .task-head{
   justify-content: space-between;
+  align-items: center;
 }
+
 .task-inhalt{
   overflow-y: auto;
 }

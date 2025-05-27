@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { PieChart, Pie, Cell, Tooltip, Legend } from "recharts";
+import "./StyleComp/StatusPie.css";
 
-const COLORS = ["#36A2EB", "#FF6384", "#FFCE56", "#4BC0C0", "#9966FF", "#E7E9ED"];
+const COLORS = ["#FFCCF2", "#977DFF", "#0033FF", "#0600AB", "#F2E6EE"];
 
 const StatusPie = () => {
   const [data, setData] = useState([]);
@@ -38,7 +39,7 @@ const StatusPie = () => {
   }, []);
 
   return (
-    <div style={{ width: "100%", maxWidth: 500, margin: "auto" }}>
+    <div className="status-pie" style={{ width: "100%", maxWidth: 500, margin: "auto" }}>
       <h3>Task-Status-Verteilung</h3>
       {data.length === 0 ? (
         <p>Keine Tasks vorhanden.</p>

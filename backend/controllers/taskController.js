@@ -1,8 +1,13 @@
 exports.createTask = async (req, res) => {
-    const pool = req.app.locals.pool;
-    const { teamId } = req.params;
-    const { title, description, assignedTo, deadline ,priority_flag, project_id} = req.body;
-    const userId = req.userId;
+  const pool = req.app.locals.pool;
+  const { teamId } = req.params;
+  const { title, description, assignedTo, deadline, priority_flag, project_id, status } = req.body;
+  const userId = req.userId;
+
+  console.log("🧪 Request empfangen:");
+  console.log("Team ID:", teamId);
+  console.log("User ID:", userId);
+  console.log("Body:", req.body);
   
     if (!title) {
       return res.status(400).json({ error: "Titel ist erforderlich" });
@@ -18,13 +23,21 @@ exports.createTask = async (req, res) => {
       }
   
       const newTask = await pool.query(
-        `INSERT INTO tasks (team_id, title, description, assigned_to, deadline, status,priority_flag, project_id)
-         VALUES ($1, $2, $3, $4, $5, 'To Do', $6, $7) RETURNING *`,
-        [teamId, title, description, assignedTo || null, deadline || null, priority_flag || null, project_id || null]
+        `INSERT INTO tasks (team_id, title, description, assigned_to, deadline, status, priority_flag, project_id)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *`,
+        [teamId, title, description, assignedTo || null, deadline || null, status || 'Planning', priority_flag || null, project_id || null]
       );
   
       res.json({ message: "Task erfolgreich erstellt", task: newTask.rows[0] });
+      res.status(201).json({ task });
     } catch (err) {
+        console.error("Fehler in createTask:", err);
+        if (error.name === "SequelizeValidationError") {
+          return res.status(400).json({ 
+            message: "Validierungsfehler",
+            details: error.errors.map(e => e.message) 
+          });
+        }
       res.status(500).json({ error: "Interner Serverfehler" });
     }
   };
@@ -32,11 +45,11 @@ exports.createTask = async (req, res) => {
   exports.getTasksByTeam = async (req, res) => {
     const pool = req.app.locals.pool;
     const { teamId } = req.params;
-    const { sortBy } = req.query;
+    const { sortBy, assignedTo, projectId, priority_flag } = req.query;
   
     const validSortFields = ["created_at", "deadline", "status"];
     const orderBy = validSortFields.includes(sortBy) ? sortBy : "created_at";
-  
+    console.log("🔍 getTasksByTeam req.query:", req.query)
     try {
       const memberCheck = await pool.query(
         "SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2",
@@ -46,17 +59,51 @@ exports.createTask = async (req, res) => {
         return res.status(403).json({ error: "Du bist kein Mitglied dieses Teams" });
       }
   
-      const tasks = await pool.query(
-        `SELECT t.*, u.name AS assigned_to_name
-         FROM tasks t
-         LEFT JOIN users u ON t.assigned_to = u.id
-         WHERE t.team_id = $1
-         ORDER BY ${orderBy} ASC`,
-        [teamId]
-      );
+      let queryText = `
+        SELECT t.*, u.name AS assigned_to_name
+        FROM tasks t
+        LEFT JOIN users u ON t.assigned_to = u.id
+        WHERE t.team_id = $1
+      `;
   
+      const queryParams = [teamId];
+      let paramCounter = 2; // Start bei 2 weil $1 bereits teamId ist
+  
+      if (assignedTo) {
+        if (assignedTo === 'unassigned') {
+          queryText += ` AND t.assigned_to IS NULL`;
+        } else {
+          queryText += ` AND t.assigned_to = $${paramCounter}`;
+          queryParams.push(assignedTo);
+          paramCounter++;
+        }
+      }
+  
+      if (projectId) {
+        if (projectId === 'unassigned') {
+          queryText += ` AND t.project_id IS NULL`;
+        } else {
+          queryText += ` AND t.project_id = $${paramCounter}`;
+          queryParams.push(projectId);
+          paramCounter++;
+        }
+      }
+  
+      if (priority_flag) {
+        queryText += ` AND t.priority_flag = $${paramCounter}`;
+        queryParams.push(priority_flag);
+        paramCounter++;
+      }
+  
+      queryText += ` ORDER BY ${orderBy} ASC`;
+  
+      console.log("Executing query:", queryText);
+      console.log("With parameters:", queryParams);
+  
+      const tasks = await pool.query(queryText, queryParams);
       res.json(tasks.rows);
     } catch (err) {
+      console.error("Fehler in getTasksByTeam:", err);
       res.status(500).json({ error: "Interner Serverfehler" });
     }
   };

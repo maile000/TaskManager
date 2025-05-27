@@ -23,6 +23,33 @@ function Board() {
   const [isCommentOpen, setCommentOpen] = useState(false);
   const taskModalRef = useRef(null);
   const commentModalRef = useRef(null);
+  const initialFilters = {
+    assignedTo: '',
+    projectId: '',
+    priority_flag: "",
+    sortBy: 'created_at'
+  };
+  const [filters, setFilters] = useState(initialFilters);
+  const [teamMembers, setTeamMembers] = useState([]);
+  const [projects, setProjects] = useState([]);
+  const [priorities, setPriorities] = useState([]);
+  const [isOpen, setIsOpen] = useState(false);
+  const toggle = () => setIsOpen(o => !o);
+
+useEffect(() => {
+  setPriorities([
+    { value: "Low",      label: "Low" },
+    { value: "Medium",   label: "Medium" },
+    { value: "High",     label: "High" },
+    { value: "Critical", label: "Critical" }
+  ]);
+}, []);
+
+
+  const handleFilterChange = (filterName, value) => {
+    setFilters(prev => ({ ...prev, [filterName]: value }));
+    fetchTasks();
+  };
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -46,15 +73,52 @@ function Board() {
   
   useEffect(() => {
     fetchTasks();
+  }, [teamId, filters]); 
+
+  useEffect(() => {
+    const fetchTeamMembers = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/members`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+        setTeamMembers(response.data);
+      } catch (error) {
+        console.error("Fehler beim Laden der Team-Mitglieder:", error);
+      }
+    };
+  
+    if (teamId) {
+      fetchTeamMembers();
+    }
+  }, [teamId]);
+
+  useEffect(() => {
+    if (!teamId) return;
+    const loadProjects = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/projects`,{ 
+        headers: { Authorization: `Bearer ${token}` } 
+      });
+      setProjects(response.data);
+      } catch (err) {
+        console.error("Fehler beim Laden der Projekte:", err);
+      }};
+      loadProjects();
   }, [teamId]);
 
   const fetchTasks = async () => {
     if (!teamId) return;
-
     try {
       const token = localStorage.getItem("token");
+      const params = {
+        ...filters,
+        userId
+      };
+
       const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/tasks`, {
-        params: { userId },
+        params: { ...filters,  userId },
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -63,6 +127,7 @@ function Board() {
         title: status,
         tasks: response.data.filter((task) => task.status === status),
       }));
+      console.log("▶️ fetching tasks with params:", params);
 
       setColumns(groupedTasks);
     } catch (error) {
@@ -85,17 +150,13 @@ function Board() {
     setCommentOpen(false);
   };
   
-  
   const handleDragStart = (event) => {
     const { active } = event;
     const activeId = active.id.replace("task-", "");
-
-    
-
     const task = columns.flatMap((col) => col.tasks).find((t) => t.id.toString() === activeId);
     if (task) {
         setActiveTask(task);
-    }
+  }
 };
 
 const handleDragEnd = async (event) => {
@@ -157,13 +218,68 @@ const handleDragEnd = async (event) => {
     <div className="board-background">
       <Sidebar defaultOpen={false} />
         <div>
-          <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
+          <div className="row">
+            <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
             Task erstellen
-          </button>
-          {isCreateTaskOpen && (
-            <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
-          )}
+            </button>
+            {isCreateTaskOpen && (
+              <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
+            )}
+            <div className="collapsible-wrapper">
+              <button className="toggle-btn" onClick={toggle}>
+                {isOpen ? '◀  close' : '▶ Filter'}
+              </button>
+              <div className={`collapse-container${isOpen ? " open" : ""}`}>
+                {/* Zugewiesener Benutzer  */}
+                <select 
+                  value={filters.assignedTo} 
+                  onChange={(e) => handleFilterChange('assignedTo', e.target.value)}
+                  className="filter-select"
+                >
+                  <option value="">Alle Zuweisungen</option>
+                    <option value="unassigned">Nicht zugewiesen</option>
+                    {teamMembers.map(member => (
+                      <option key={member.user_id || member.id} value={member.user_id || member.id}>
+                        {member.name || member.username}
+                      </option>
+                    ))}
+                </select>
 
+                {/* Projekt Filter */}
+                <select
+                  value={filters.projectId}
+                  onChange={(e) => handleFilterChange('projectId', e.target.value)}
+                >
+                  <option value="">Alle Projekte</option>
+                  <option value="unassigned">Ohne Projekt</option>
+                  {projects.map(project => (
+                    <option key={project.id} value={project.id}>
+                      {project.name}
+                    </option>
+                  ))}
+                </select>
+
+                {/* Prioritäts Filter */}
+                <select
+                  value={filters.priority_flag}
+                  onChange={e => handleFilterChange("priority_flag", e.target.value)}
+                >
+                  <option value="">Alle Flags</option>
+                    {priorities.map(prio => (
+                        <option key={prio.value} value={prio.value}>
+                          {prio.label}
+                        </option>
+                      ))}
+                </select>
+
+                {/* Zurücksetzen */}
+                <button className="button reset-btn"
+                  onClick={() => setFilters(initialFilters)}>
+                    Filter zurücksetzen
+                </button>
+              </div>
+            </div>
+          </div>
           <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
             <SortableContext items={columns.map((col) => col.id)}>
               <div className="board-box" style={{ display: "flex" }}>

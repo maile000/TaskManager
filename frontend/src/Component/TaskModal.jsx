@@ -115,14 +115,8 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
   return (
     <div className="overlayStyleCard" onClick={onClose}>
       <div className="modalStyleCard" onClick={(e) => e.stopPropagation()}>
-        <div className="modalClose">
-          <button onClick={onClose} className="close-btn"></button>
-        </div>
-        <div className="column">
-          <div className="row  task-head">
-            <div >
-            
-              {isEditing ? (
+        <div className="task-head row">
+            {isEditing ? (
                 <div>
                    <label><strong>Titel:</strong></label>
                   <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} />
@@ -130,13 +124,12 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
               ) : (
                 <h1>{title}</h1>
               )}
-          </div>
-            <button onClick={() => setIsEditing(!isEditing)} className="button">
+            <div className="modalClose">
+              <button onClick={() => setIsEditing(!isEditing)} className="button">
               ✏️ Bearbeiten
-            </button>
-          </div>
-          
-         
+              </button> 
+              <button onClick={onClose} className="close-btn"></button>
+            </div>
         </div>
         <div className="task-inhalt">
           <label style={{ width: '100px' }}><strong>Beschreibung:</strong></label>

@@ -86,7 +86,8 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
           deadline,
           assignedTo: assignedTo || null,
           priority_flag: priority_flag || "Low",
-          project_id: selectedProjectId || null, // Projekt-ID übergeben
+          project_id: selectedProjectId || null,
+          status: "Planning",
         },
         { headers: { Authorization: `Bearer ${token}` } }
       );
