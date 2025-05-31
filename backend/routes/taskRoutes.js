@@ -10,7 +10,8 @@ const {
   updateTaskPosition,
   getUserTasks,
   getTeamProjects,
-  postTeamProject
+  postTeamProject,
+  getTeamProgress
 } = require("../controllers/taskController");
 
 router.post("/teams/:teamId/tasks", authenticate, createTask);
@@ -22,5 +23,6 @@ router.put("/tasks/:taskId/position", authenticate, updateTaskPosition);
 router.get("/user/tasks", authenticate, getUserTasks);
 router.get("/teams/:teamId/projects", authenticate, getTeamProjects);
 router.post("/teams/:teamId/projects", authenticate, postTeamProject);
+router.get("/teams/:teamId/progress", authenticate, getTeamProgress);
 
 module.exports = router;

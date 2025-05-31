@@ -15,10 +15,10 @@ function Home () {
         <div className="home-background">
             <div className="home-grid">
                 <div className="item item1">1
-
+                  <StatusPie/>
                 </div>
                 <div className="item item2">2
-                    <StatusPie/>
+                  
                 </div>
                 <div className="item item3">
                     <div style={{ fontSize: "20px", fontWeight: "bold", textAlign: "center", color: "white" }}>

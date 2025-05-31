@@ -10,6 +10,7 @@ import { CSS } from "@dnd-kit/utilities";
 import TaskCard from "../Component/TaskCard";
 import TaskModal from "../Component/TaskModal";
 import CommentModal from "../Component/CommentModal";
+import TeamProgress from "../Component/TeamProgress";
 
 const statuses = ["Planning", "To Do", "In Progress", "Done"];
 
@@ -35,6 +36,7 @@ function Board() {
   const [priorities, setPriorities] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(o => !o);
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
 
 useEffect(() => {
   setPriorities([
@@ -209,6 +211,7 @@ const handleDragEnd = async (event) => {
       );
 
       console.log("✅ Task-Status erfolgreich aktualisiert");
+      setRefreshTrigger(prev => prev + 1);
   } catch (error) {
       console.error("❌ Fehler beim Aktualisieren des Task-Status:", error.response ? error.response.data : error);
   }
@@ -218,67 +221,75 @@ const handleDragEnd = async (event) => {
     <div className="board-background">
       <Sidebar defaultOpen={false} />
         <div>
-          <div className="row">
-            <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
-            Task erstellen
-            </button>
-            {isCreateTaskOpen && (
-              <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
-            )}
-            <div className="collapsible-wrapper">
-              <button className="toggle-btn" onClick={toggle}>
-                {isOpen ? '◀  close' : '▶ Filter'}
+          <div className="column">
+            <div className="row" style={{alignItems:"center"}}>
+              <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
+              Task erstellen
               </button>
-              <div className={`collapse-container${isOpen ? " open" : ""}`}>
-                {/* Zugewiesener Benutzer  */}
-                <select 
-                  value={filters.assignedTo} 
-                  onChange={(e) => handleFilterChange('assignedTo', e.target.value)}
-                  className="filter-select"
-                >
-                  <option value="">Alle Zuweisungen</option>
-                    <option value="unassigned">Nicht zugewiesen</option>
-                    {teamMembers.map(member => (
-                      <option key={member.user_id || member.id} value={member.user_id || member.id}>
-                        {member.name || member.username}
-                      </option>
-                    ))}
-                </select>
-
-                {/* Projekt Filter */}
-                <select
-                  value={filters.projectId}
-                  onChange={(e) => handleFilterChange('projectId', e.target.value)}
-                >
-                  <option value="">Alle Projekte</option>
-                  <option value="unassigned">Ohne Projekt</option>
-                  {projects.map(project => (
-                    <option key={project.id} value={project.id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-
-                {/* Prioritäts Filter */}
-                <select
-                  value={filters.priority_flag}
-                  onChange={e => handleFilterChange("priority_flag", e.target.value)}
-                >
-                  <option value="">Alle Flags</option>
-                    {priorities.map(prio => (
-                        <option key={prio.value} value={prio.value}>
-                          {prio.label}
+              {isCreateTaskOpen && (
+                <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
+              )}
+              <div className="collapsible-wrapper">
+                <button className="toggle-btn" onClick={toggle}>
+                  {isOpen ? '◀  close' : '▶ Filter'}
+                </button>
+                <div className={`collapse-container${isOpen ? " open" : ""}`}>
+                  {/* Zugewiesener Benutzer  */}
+                  <select 
+                    value={filters.assignedTo} 
+                    onChange={(e) => handleFilterChange('assignedTo', e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="">Alle Zuweisungen</option>
+                      <option value="unassigned">Nicht zugewiesen</option>
+                      {teamMembers.map(member => (
+                        <option key={member.user_id || member.id} value={member.user_id || member.id}>
+                          {member.name || member.username}
                         </option>
                       ))}
-                </select>
+                  </select>
 
-                {/* Zurücksetzen */}
-                <button className="button reset-btn"
-                  onClick={() => setFilters(initialFilters)}>
-                    Filter zurücksetzen
-                </button>
+                  {/* Projekt Filter */}
+                  <select
+                    value={filters.projectId}
+                    onChange={(e) => handleFilterChange('projectId', e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="">Alle Projekte</option>
+                    <option value="unassigned">Ohne Projekt</option>
+                    {projects.map(project => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {/* Prioritäts Filter */}
+                  <select
+                    value={filters.priority_flag}
+                    onChange={e => handleFilterChange("priority_flag", e.target.value)}
+                    className="filter-select"
+                  >
+                    <option value="">Alle Flags</option>
+                      {priorities.map(prio => (
+                          <option key={prio.value} value={prio.value}>
+                            {prio.label}
+                          </option>
+                        ))}
+                  </select>
+
+                  {/* Zurücksetzen */}
+                  <button className="button reset-btn"
+                    onClick={() => setFilters(initialFilters)}>
+                      Filter zurücksetzen
+                  </button>
+                </div>
               </div>
+            
             </div>
+            <TeamProgress  
+            refreshTrigger={refreshTrigger} 
+            filters={filters} />
           </div>
           <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} collisionDetection={closestCorners}>
             <SortableContext items={columns.map((col) => col.id)}>

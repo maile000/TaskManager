@@ -307,3 +307,67 @@ exports.postTeamProject = async (req, res) => {
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 };
+
+exports.getTeamProgress = async (req, res) => {
+  const pool = req.app.locals.pool;
+  const { teamId } = req.params;
+  const { projectId, priority_flag } = req.query;
+
+  try {
+    // 1. Mitgliedschaft überprüfen
+    const memberCheck = await pool.query(
+      "SELECT * FROM team_members WHERE user_id = $1 AND team_id = $2",
+      [req.userId, teamId]
+    );
+    if (memberCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Du bist kein Mitglied dieses Teams" });
+    }
+
+    // 2. Basis-Query
+    let queryText = `
+      SELECT 
+        COUNT(*) FILTER (WHERE status NOT IN ('Archived', 'Planning')) AS total_tasks,
+        COUNT(*) FILTER (WHERE status = 'Done') AS completed_tasks
+      FROM tasks 
+      WHERE team_id = $1
+    `;
+    
+    const queryParams = [teamId];
+    let paramCounter = 2;
+
+    // Filter hinzufügen
+    if (projectId) {
+      if (projectId === 'unassigned') {
+        queryText += ` AND project_id IS NULL`;
+      } else {
+        queryText += ` AND project_id = $${paramCounter}`;
+        queryParams.push(projectId);
+        paramCounter++;
+      }
+    }
+
+    if (priority_flag) {
+      queryText += ` AND priority_flag = $${paramCounter}`;
+      queryParams.push(priority_flag);
+      paramCounter++;
+    }
+
+    // 3. Abfrage ausführen
+    const progressData = await pool.query(queryText, queryParams);
+    const { total_tasks, completed_tasks } = progressData.rows[0];
+
+    // 4. Progress berechnen
+    const progress = total_tasks > 0 
+      ? Math.round((completed_tasks / total_tasks) * 100)
+      : 0;
+
+    res.json({
+      total_tasks,
+      completed_tasks,
+      progress
+    });
+  } catch (err) {
+    console.error("Fehler in getTeamProgress:", err);
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
+};

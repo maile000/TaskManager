@@ -1,6 +1,6 @@
 .board-background{
     background: linear-gradient(to bottom ,#977DFF, #00033D);
-    height: 100vh;
+    min-height: 100vh;
     display: flex;
     justify-content: flex-end;
     padding-right: 25px;
@@ -80,21 +80,29 @@
 .filter-select {
     padding: 8px 12px;
     background-color: 0600AB;
-    min-width: 180px;
+    min-width: 150px;
+    height: 50px;
     font-size: 14px;
     margin-right: 10px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
+    border-radius: 15px;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
  }
   
 .filter-select:focus {
     outline: none;
     border-color: #646cff;
+    
 }
 
 .collapsible-wrapper {
     position: relative;
-  }
+}
   
-  .toggle-btn {
+.toggle-btn {
     display: inline-block;
     margin-bottom: 0.5rem;
     padding: 0.3rem 0.8rem;
@@ -103,16 +111,16 @@
     border: none;
     border-radius: 3px;
     cursor: pointer;
-  }
+}
   
-  .collapse-container {
+.collapse-container {
     overflow: hidden;
     display: flex;
     overflow: hidden;
     white-space: nowrap;
     max-width: 0;
     transition: max-width 1s ease, padding 0.4s ease;
-  }
+}
   
   .collapse-container.open {
     max-width: 800px;

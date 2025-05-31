@@ -34,9 +34,9 @@ function Team() {
   const handleCreateTeam = (newTeam) => {
     setTeams([...teams, newTeam]);
   }
-
+  // className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}
   return (
-    <div className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}>
+    <div >
       <div style={{margin:"80px"}}>
         <div className="column team-managment-div">
           <h1>Team Management</h1>
