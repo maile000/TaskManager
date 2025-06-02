@@ -162,58 +162,61 @@ useEffect(() => {
 };
 
 const handleDragEnd = async (event) => {
-  
-  setActiveTask(null); 
-
   const { active, over } = event;
   if (!over) return;
 
   const activeId = active.id.replace("task-", "");
   let overContainer = over.id;
 
+  // Finde die Ziel-Spalte
   if (overContainer.startsWith("task-")) {
-      const taskId = overContainer.replace("task-", "");
-      const foundColumn = columns.find((col) => col.tasks.some((task) => task.id.toString() === taskId));
-      if (foundColumn) {
-          overContainer = foundColumn.id;
-      } else {
-          console.error("❌ Fehler: Task konnte keiner Spalte zugeordnet werden.");
-          return;
-      }
+    const taskId = overContainer.replace("task-", "");
+    const foundColumn = columns.find((col) => 
+      col.tasks.some((task) => task.id.toString() === taskId)
+    );
+    overContainer = foundColumn?.id || columns[0].id;
   }
 
-  const oldColumn = columns.find((col) => col.tasks.some((task) => task.id.toString() === activeId));
-  if (!oldColumn) return;
-
-  if (oldColumn.id === overContainer) {
-      console.log("🔙 Task bleibt in der gleichen Spalte. Transformiere zurück.");
-      return;
-  }
-
-  setColumns((prev) =>
-      prev.map((col) =>
-          col.tasks.some((task) => task.id.toString() === activeId)
-              ? { ...col, tasks: col.tasks.filter((task) => task.id.toString() !== activeId) }
-              : col.id === overContainer
-              ? { ...col, tasks: [...col.tasks, { ...prev.flatMap(c => c.tasks).find(t => t.id.toString() === activeId), status: overContainer }] }
-              : col
-      )
+  // Finde die ursprüngliche Spalte
+  const oldColumn = columns.find((col) => 
+    col.tasks.some((task) => task.id.toString() === activeId)
   );
 
-  try {
-      const token = localStorage.getItem("token");
-      console.log(`📡 Sende API-Update für Task ID: ${activeId}, Neuer Status: ${overContainer}`);
-      
-      await axios.put(
-          `http://localhost:5000/api/tasks/${activeId}/status`,
-          { status: overContainer }, 
-          { headers: { Authorization: `Bearer ${token}` } }
-      );
+  if (!oldColumn || oldColumn.id === overContainer) {
+    return;
+  }
 
-      console.log("✅ Task-Status erfolgreich aktualisiert");
-      setRefreshTrigger(prev => prev + 1);
+  try {
+    const token = localStorage.getItem('token');
+    
+    // 1. Sende Statusupdate an den Server
+    const response = await axios.put(
+      `http://localhost:5000/api/tasks/${activeId}/status`,
+      { status: overContainer },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    const updatedTask = response.data.task;
+
+    // 2. Aktualisiere das lokale State mit dem zurückgegebenen Task (inkl. aktualisierter Punkte)
+    setColumns(prev => 
+      prev.map(col => {
+        if (col.id === oldColumn.id) {
+          return { ...col, tasks: col.tasks.filter(t => t.id.toString() !== activeId) };
+        }
+        if (col.id === overContainer) {
+          return { ...col, tasks: [...col.tasks, updatedTask] };
+        }
+        return col;
+      })
+    );
+
+    console.log("Task erfolgreich verschoben und Punkte aktualisiert");
+
   } catch (error) {
-      console.error("❌ Fehler beim Aktualisieren des Task-Status:", error.response ? error.response.data : error);
+    console.error("Fehler beim Aktualisieren des Task-Status:", error);
+    // Falls Fehler, Zustand zurücksetzen
+    fetchTasks();
   }
 };
 

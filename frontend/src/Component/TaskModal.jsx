@@ -16,21 +16,6 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
   const [projects, setProjects] = useState([]);
   const [projectId, setProjectId] = useState(null);  
 
-  const pointsByStatus = {
-    "Planning": 100,
-    "To Do": 200,
-    "In Progress": 300,
-    "Done": 500,
-    "Archived": 0
-  };
-
-  const pointsByFlag = {
-    "Low": 10,
-    "Medium": 30,
-    "High": 50,
-    "Critical": 100
-  };
-
   useEffect(() => {
     if (task) {
       setTitle(task.title || "");
@@ -88,7 +73,6 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
         description,
         status,
         assigned_to: assignedTo,
-        points: (pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0),
         priority_flag,
         deadline,
         project_id: projectId,
@@ -242,8 +226,7 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
               </div>
           <p ><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
           <p > 
-            <strong>Punkte:</strong>{" "}
-            {(pointsByStatus[status] || 0) + (pointsByFlag[priority_flag] || 0)}
+            <strong>Punkte:</strong>{task.points || 0}
           </p>
         </div>  
         <button className="button" onClick={openComment}>Kommentar</button>

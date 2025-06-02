@@ -11,7 +11,9 @@ const {
   getUserTasks,
   getTeamProjects,
   postTeamProject,
-  getTeamProgress
+  getTeamProgress,
+  getUserPointsAcrossTeams,
+  
 } = require("../controllers/taskController");
 
 router.post("/teams/:teamId/tasks", authenticate, createTask);
@@ -24,5 +26,6 @@ router.get("/user/tasks", authenticate, getUserTasks);
 router.get("/teams/:teamId/projects", authenticate, getTeamProjects);
 router.post("/teams/:teamId/projects", authenticate, postTeamProject);
 router.get("/teams/:teamId/progress", authenticate, getTeamProgress);
+router.get("/user/points", authenticate, getUserPointsAcrossTeams);
 
 module.exports = router;
