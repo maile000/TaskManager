@@ -41,11 +41,14 @@ const CreateTeamModal = ({ onClose, onCreate }) => {
             onChange={(e) => setTeamName(e.target.value)}
             placeholder="Teamname"
             required
+            className="input-modal"
           />
-          <button type="submit" className="button">Erstellen</button>
-          <button type="button" onClick={onClose} className="button">
-            Abbrechen
-          </button>
+          <div className="modal-button-div">
+            <button type="submit" className="button">Erstellen</button>
+            <button type="button" onClick={onClose} className="secondary-button">
+              Abbrechen
+            </button>
+          </div>
         </form>
       </div>
     </div>

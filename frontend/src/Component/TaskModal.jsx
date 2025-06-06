@@ -94,6 +94,33 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
     }
   };
 
+  const handleDelete = async () => {
+    if (
+      !window.confirm(
+        "Soll diese Task wirklich gelöscht werden? Dieser Vorgang kann nicht rückgängig gemacht werden."
+      )
+    ) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem("token");
+      await axios.delete(
+        `http://localhost:5000/api/teams/${teamId}/tasks/${task.id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      console.log("🗑️ Task erfolgreich gelöscht!");
+      await refreshTaskList();
+      onClose();
+    } catch (error) {
+      console.error("❌ Fehler beim Löschen der Task:", error);
+      alert("Löschen der Task fehlgeschlagen.");
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
@@ -179,7 +206,6 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
             )}
           </div>
           <div className="label-task">
-
             <label style={{ width: '100px' }}><strong>Projekt:</strong></label>
               {isEditing ? (
                 <>
@@ -196,7 +222,7 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
                   ) : (
                     <div>
                       <button
-                        className="button"
+                        className="secondary-button"
                         onClick={() => {
                           
                         }}
@@ -224,15 +250,26 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
                   <p>{deadline ? new Date(deadline).toLocaleDateString() : "Keine Deadline"}</p>
                 )}
               </div>
-          <p ><strong>Erstellt am:</strong> {new Date(task.created_at).toLocaleString()}</p>
-          <p > 
-            <strong>Punkte:</strong>{task.points || 0}
+          <p contentEditable className="label-task">
+            <strong style={{ width: '100px' }}> erstellt am:</strong> 
+            {new Date(task.created_at).toLocaleString()}
+          </p>
+          <p className="label-task"> 
+            <strong style={{ width: '100px' }}>Punkte:</strong>
+            {task.points || 0}
           </p>
         </div>  
-        <button className="button" onClick={openComment}>Kommentar</button>
-        
-        {isEditing && (
-          <button onClick={handleSaveChanges} className="saveButtonStyleCard">Speichern</button>
+        {isEditing ? (
+          <div className="modal-button-div">
+            <button onClick={handleSaveChanges} className="saveButtonStyleCard">Speichern</button>
+            <button
+              onClick={handleDelete}
+              className="secondary-button">
+              Löschen
+            </button>
+          </div>
+        ) : (
+           <button className="button" onClick={openComment}>Kommentar</button>
         )}
       </div>
     </div>

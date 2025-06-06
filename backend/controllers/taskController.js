@@ -1,5 +1,3 @@
-// controllers/taskController.js
-
 // 1. Zuordnung von Status → Punkte
 const pointsByStatus = {
   "Planning":     10,
@@ -87,6 +85,53 @@ exports.createTask = async (req, res) => {
     });
   } catch (err) {
     console.error("Fehler in createTask:", err);
+    return res.status(500).json({ error: "Interner Serverfehler" });
+  }
+};
+
+// controllers/taskController.js
+
+/**
+ * deleteTask
+ * Löscht eine Task innerhalb eines Teams, wenn der eingeloggte User Mitglied des Teams ist.
+ */
+exports.deleteTask = async (req, res) => {
+  const pool = req.app.locals.pool;
+  const { teamId, taskId } = req.params;
+  const userId = req.userId;
+
+  try {
+    // 1. Prüfen, ob der eingeloggte User Mitglied im Team ist
+    const memberCheck = await pool.query(
+      "SELECT 1 FROM team_members WHERE user_id = $1 AND team_id = $2",
+      [userId, teamId]
+    );
+    if (memberCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Du bist kein Mitglied dieses Teams" });
+    }
+
+    // 2. Prüfen, ob die Task überhaupt in diesem Team existiert
+    const taskRes = await pool.query(
+      "SELECT id FROM tasks WHERE id = $1 AND team_id = $2",
+      [taskId, teamId]
+    );
+    if (taskRes.rows.length === 0) {
+      return res.status(404).json({ error: "Task nicht gefunden" });
+    }
+
+    // 3. Task löschen
+    await pool.query(
+      "DELETE FROM tasks WHERE id = $1",
+      [taskId]
+    );
+
+    // 4. Optional: Falls du team_points oder andere Zusammenhänge aktualisieren möchtest,
+    //    kannst du hier weitere Queries einbauen (z. B. Punktabzug).
+    //    Ist nicht zwingend nötig, wenn du das in einem separaten Cron‐Job o. Ä. machst.
+
+    return res.json({ message: "Task erfolgreich gelöscht" });
+  } catch (err) {
+    console.error("Fehler in deleteTask:", err);
     return res.status(500).json({ error: "Interner Serverfehler" });
   }
 };
@@ -522,46 +567,37 @@ exports.getTeamProgress = async (req, res) => {
   }
 };
 
-/**
- * getUserPointsAcrossTeams
- * Gibt die Gesamtpunkte eines Users zurück (Team-Punkte + Task-Punkte aus erledigten Tasks).
- */
-exports.getUserPointsAcrossTeams = async (req, res) => {
+exports.getUserTaskPoints = async (req, res) => {
   const pool = req.app.locals.pool;
   const userId = req.userId;
 
   try {
-    // 1. Summe aller Team-Punkte (aus team_points)
-    const teamPointsRes = await pool.query(
-      `SELECT COALESCE(SUM(points_in_team), 0) AS team_points
-         FROM team_points
-        WHERE user_id = $1`,
-      [userId]
-    );
-    const teamPoints = teamPointsRes.rows[0].team_points;
-
-    // 2. Summe aller Task-Punkte (nur erledigte Tasks)
+    // 1. Punkte aus  Tasks holen (gruppiert nach Team)
     const taskPointsRes = await pool.query(
-      `SELECT COALESCE(SUM(points), 0) AS task_points
-         FROM tasks
-        WHERE assigned_to = $1
-          AND status = 'Done'`,
+      `SELECT 
+         t.team_id,
+         tm.name AS team_name,
+         COALESCE(SUM(t.points), 0) AS task_points
+       FROM tasks t
+       JOIN teams tm ON t.team_id = tm.id
+       WHERE t.assigned_to = $1
+       GROUP BY t.team_id, tm.name
+       ORDER BY tm.name`,
       [userId]
     );
-    const taskPoints = taskPointsRes.rows[0].task_points;
 
-    // 3. Gesamtsumme
-    const totalPoints = teamPoints + taskPoints;
+    // 2. Gesamtsumme aller Task-Punkte berechnen
+    const totalTaskPoints = taskPointsRes.rows.reduce((sum, row) => sum + parseInt(row.task_points), 0);
 
     return res.json({
-      total_points: totalPoints,
+      total_points: totalTaskPoints,
+      points_by_team: taskPointsRes.rows,
       breakdown: {
-        team_points: teamPoints,
-        task_points: taskPoints
+        task_points: totalTaskPoints
       }
     });
   } catch (err) {
-    console.error("Fehler in getUserPointsAcrossTeams:", err);
+    console.error("Fehler in getUserTaskPoints:", err);
     return res.status(500).json({ error: "Interner Serverfehler" });
   }
 };

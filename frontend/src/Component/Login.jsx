@@ -55,7 +55,7 @@ function Login({ setUser }) {
             Login
           </button>
           <p>
-            Don't have an account yet? <Link to="/register">Sign up here</Link>.
+            Noch kein Account? <Link to="/register">hier anmelden</Link>.
           </p>
         </form>
       </div>

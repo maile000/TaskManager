@@ -1,9 +1,16 @@
 .teampage{
-    margin: 30px 30px 30px 95px;
+   
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
+    min-height: 100vh;
+    color: #F2E6EE;
+    
 }
 
 .team-uebersicht-div{
     align-items: center;
+    gap: 30px;
 }
 
 .team-members{

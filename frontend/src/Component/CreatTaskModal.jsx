@@ -114,52 +114,62 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-            <textarea
+            <div className="modal-textarea">
+              <textarea
               placeholder="Beschreibung"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
             />
-            <input
+            </div>
+            <div className="modal-sellect-div">
+              <label>Deadline</label>
+              <input
               type="datetime-local"
               value={deadline}
               onChange={(e) => setDeadline(e.target.value)}
             />
+            </div>
+            
+            <div className="modal-sellect-div">
             <label>Priorität</label>
-            <select
-              value={priority_flag}
-              onChange={(e) => setFlag(e.target.value)}
-            >
-              <option value="Low">Low</option>
-              <option value="Medium">Medium</option>
-              <option value="High">High</option>
-              <option value="Critical">Critical</option>
-            </select>
-
+              <select
+                value={priority_flag}
+                onChange={(e) => setFlag(e.target.value)}
+                className="modal-select"
+              >
+                <option value="Low">Low</option>
+                <option value="Medium">Medium</option>
+                <option value="High">High</option>
+                <option value="Critical">Critical</option>
+              </select>
+            </div>
             {/* Projekte-Dropdown */}
-            <div className="form-group">
-              <label>Projekt (optional)</label>
-              {projects.length > 0 ? (
-                <select
-                  value={selectedProjectId}
-                  onChange={(e) => setSelectedProjectId(e.target.value)}
-                >
-                  <option value="">Kein Projekt</option>
-                  {projects.map((project) => (
-                    <option key={project.id} value={project.id}>
-                      {project.name}
-                    </option>
-                  ))}
-                </select>
-              ) : (
-                <p>Keine Projekte vorhanden.</p>
-              )}
-
+            <div className="form-group column">
+            <div className="modal-sellect-div">
+                <label>Projekt (optional)</label>
+                {projects.length > 0 ? (
+                  <select
+                    value={selectedProjectId}
+                    onChange={(e) => setSelectedProjectId(e.target.value)}
+                    className="modal-select"
+                  >
+                    <option value="">Kein Projekt</option>
+                    {projects.map((project) => (
+                      <option key={project.id} value={project.id}>
+                        {project.name}
+                      </option>
+                    ))}
+                  </select>
+                ) : (
+                  <p>Keine Projekte vorhanden.</p>
+                )}
+              </div>
               {/* Button für neues Projekt (nur anzeigen, wenn kein Projekt erstellt wird) */}
               {!showNewProjectInput && (
                 <button
                   type="button"
                   onClick={() => setShowNewProjectInput(true)}
-                  className="button"
+                  className="secondary-button "
                 >
                   Neues Projekt erstellen
                 </button>
@@ -178,26 +188,28 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
                   <button
                     type="button"
                     onClick={handleCreateProject}
-                    className="button"
+                    className="secondary-button "
                   >
                     Hinzufügen
                   </button>
                 </div>
               )}
             </div>
-
-            <label>Zuweisen an:</label>
-            <select
-              value={assignedTo}
-              onChange={(e) => setAssignedTo(e.target.value)}
-            >
-              <option value="">Niemand</option>
-              {members.map((member) => (
-                <option key={member.id} value={member.id}>
-                  {member.name}
-                </option>
-              ))}
-            </select>
+            <div className="modal-sellect-div">
+              <label>Zuweisen an:</label>
+              <select
+                value={assignedTo}
+                onChange={(e) => setAssignedTo(e.target.value)}
+                className="modal-select"
+              >
+                <option value="">Niemand</option>
+                {members.map((member) => (
+                  <option key={member.id} value={member.id}>
+                    {member.name}
+                  </option>
+                ))}
+              </select>
+             </div> 
             <button type="submit" className="button">
               Task erstellen
             </button>

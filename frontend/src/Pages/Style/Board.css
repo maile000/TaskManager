@@ -1,14 +1,15 @@
+
 .board-background{
     background: linear-gradient(to bottom ,#977DFF, #00033D);
     min-height: 100vh;
     display: flex;
-    justify-content: flex-end;
-    padding-right: 25px;
+    justify-content: center; 
+    padding: 25px 10px; 
 } 
 
 .board-box{
     background: #00033D;
-    width: 85vw;
+   
     min-height: 65vh;
     display: flex;
     flex-wrap: wrap;
@@ -17,6 +18,9 @@
     color: white;
     padding: 25px;
     margin-bottom: 70px;
+    max-width: 1600px;
+    gap: 16px; 
+    margin-left: 80px;
 }
 
 .task-btn{
@@ -39,10 +43,6 @@
     padding-bottom: 15px;
 }
 
-.column-title:hover{
-    color: #0033FF;
-}
-
 .column-div{
     background: rgba(255, 255, 255, 0.2);
     backdrop-filter: blur(10px) saturate(180%);
@@ -55,10 +55,19 @@
     min-width: 200px;
     max-height: 400px;
     margin: 15px 0 15px 0;
+    min-width: 250px;      
+    
+    max-width: 25%; 
+    max-height: 400px;
+}
+
+.board-div-button{
+    align-items: center;
+    flex-wrap: wrap;
 }
 
 .column-body{ 
-    max-height: 95%;
+    flex: 1;
     overflow-y: auto;
 }
 
@@ -80,7 +89,7 @@
 .filter-select {
     padding: 8px 12px;
     background-color: 0600AB;
-    min-width: 150px;
+    min-width: 140px;
     height: 50px;
     font-size: 14px;
     margin-right: 10px;
@@ -95,11 +104,11 @@
 .filter-select:focus {
     outline: none;
     border-color: #646cff;
-    
 }
 
 .collapsible-wrapper {
     position: relative;
+    margin-left: 20px;   
 }
   
 .toggle-btn {
@@ -111,6 +120,10 @@
     border: none;
     border-radius: 3px;
     cursor: pointer;
+    position: relative;
+    top: 50px;
+    border-radius: 15px;
+    gap: 2px;
 }
   
 .collapse-container {
@@ -120,10 +133,22 @@
     white-space: nowrap;
     max-width: 0;
     transition: max-width 1s ease, padding 0.4s ease;
+    position: relative;
+    left: 97px;
+    display: flex;
+    align-items:center;
+
 }
   
   .collapse-container.open {
-    max-width: 800px;
+    max-width: 600px;
+    width: auto;
+    padding-left: 10px;
+    padding-right: 10px;
+    position: relative;
+    left: 97px;
+    display: flex;
+    align-items:center;
   }
   
   .collapse-container select {
@@ -132,3 +157,105 @@
     vertical-align: middle;
   }
   
+@media (max-width: 1024px) {
+    .column-div {
+      max-width: 48%; 
+    }
+  }
+
+@media (max-width: 900px) {
+    .collapsible-wrapper {
+      position: relative;
+      left: 80px;
+      margin-left: 0;
+      width: 100%;
+      align-items: center;
+    }
+  
+    .toggle-btn {
+      position: static;
+      margin: 10px 0;
+      width: auto;
+      left: auto;
+    }
+  
+    .collapse-container {
+      position: static;
+      left: auto;
+      max-width: 100%;
+      max-height: 0;
+      padding: 0;
+      transition: max-height 0.3s ease, padding 0.3s ease;
+      flex-direction: column;
+      align-items: center;
+      overflow: hidden;
+      white-space: normal;
+      gap: 10px;
+    }
+  
+    .collapse-container.open {
+      max-height: 500px;
+      padding: 10px;
+      position: static;
+      left: auto;
+    }
+  
+    .filter-select {
+      width: 100%;
+      max-width: 300px;
+    }
+  
+    .reset-btn {
+      width: auto;
+      max-width: 300px;
+    }
+  }
+
+@media (max-width: 768px) {
+    .board-box {
+      flex-direction: column;
+      align-items: center;
+      padding: 15px;
+    }
+  
+    .column-div {
+      max-width: 100%;
+      margin: 10px 0;
+    }
+  
+    .filter-select {
+      width: 100%;          
+      min-width: unset;   
+    }
+    .toggle-btn {
+      width: 50%;      
+      text-align: center;
+      left: 100px;
+    }
+  }
+  
+  @media (max-width: 480px) {
+
+    .column-div {
+      padding: 10px;
+    }
+    .filter-select {
+      font-size: 0.8rem;
+      height: 40px;
+      width: 180px;
+    }
+    .reset-btn {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+    }
+    .toggle-btn {
+      font-size: 0.8rem;
+      padding: 6px 8px;
+    }
+    .task-card{
+        width: 150px;
+    }
+    .column-div{
+        width: 170px;
+    }
+  }

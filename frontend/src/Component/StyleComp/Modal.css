@@ -15,13 +15,17 @@
     background-color: #fff;
     padding: 20px;
     border-radius: 15px;
-    width: 300px;
+    width: 450px;
+    max-width: 80%;
     text-align: center;
 }
 
 .modalForm{
     display: flex;
     flex-direction: column;
+    gap: 10px;
+    max-height: 70vh;   
+    overflow-y: auto;
 }
 
 .inviteCode {
@@ -53,3 +57,70 @@
     background-color: #282c34;
 }
   
+.input-modal{
+    height: 40px;
+    width: 80%;
+    border-radius: 15px;
+    text-align: center;
+    border: solid 3px;
+    border-color: #9747FF;
+    background-color: none;
+    
+}
+
+.input-modal:focus{
+    border-color: #007bff;
+}
+
+.modal-button-div{
+    margin-top: 45px;
+    display: flex;
+    flex-direction: column;
+}
+
+.modalForm input {
+    min-height: 40px;
+    border-radius: 15px;
+    text-align: center;
+}
+
+.modal-sellect-div{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.new-project-input{
+    display: flex;
+    flex-direction: column;
+    margin: 5px;
+}
+
+.form-group{
+    gap: 15px;
+}
+
+.modal-select{
+    width: 100px;
+    height: 40px;
+    text-align: center;
+    border-radius: 15px;
+}
+
+.modal-textarea{
+    width: auto;
+    min-height: 100px;
+    height: auto;
+    padding: 8px;
+    font-family: inherit;
+    font-size: 1rem;
+    overflow-y: hidden;
+    resize: vertical;
+}
+
+.modal-textarea textarea{
+    width: 100%;
+    min-height: 100px;
+
+}

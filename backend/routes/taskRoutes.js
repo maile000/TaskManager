@@ -3,6 +3,7 @@ const router = express.Router();
 const authenticate = require("../middleware/auth");
 const {
   createTask,
+  deleteTask,
   getTasksByTeam,
   getSingleTask,
   updateTask,
@@ -12,11 +13,12 @@ const {
   getTeamProjects,
   postTeamProject,
   getTeamProgress,
-  getUserPointsAcrossTeams,
+  getUserTaskPoints,
   
 } = require("../controllers/taskController");
 
 router.post("/teams/:teamId/tasks", authenticate, createTask);
+router.delete("/teams/:teamId/tasks/:taskId", authenticate, deleteTask);
 router.get("/teams/:teamId/tasks", authenticate, getTasksByTeam);
 router.get("/teams/:teamId/tasks/:taskId", authenticate, getSingleTask);
 router.put("/teams/:teamId/tasks/:taskId", authenticate, updateTask);
@@ -26,6 +28,6 @@ router.get("/user/tasks", authenticate, getUserTasks);
 router.get("/teams/:teamId/projects", authenticate, getTeamProjects);
 router.post("/teams/:teamId/projects", authenticate, postTeamProject);
 router.get("/teams/:teamId/progress", authenticate, getTeamProgress);
-router.get("/user/points", authenticate, getUserPointsAcrossTeams);
+router.get("/user/points", authenticate, getUserTaskPoints);
 
 module.exports = router;

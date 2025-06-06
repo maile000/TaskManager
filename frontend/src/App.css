@@ -25,9 +25,6 @@
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
-}
 
 @keyframes App-logo-spin {
   from {
@@ -43,17 +40,40 @@
   color: #00033D;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   border-radius: 15px;
-  margin: 15px;
+  margin: 16px;
   padding: 15px;
   border: none;
   display: flex;
+  gap: 8px;
   justify-content: center;
   align-items: center;
+  min-height: 40ßx;
+  min-width: 90px;
 }
 
 .button:hover{
   background-color: #00033D;
   color: #9747FF;
+}
+
+.secondary-button{
+  border-radius: 15px;
+  gap: 8px;
+  margin: 16px;
+  padding: 15px;
+  border: 1px;
+  border-color: #9747FF;
+  color: #9747FF;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 40px;
+  min-width: 90px;
+}
+
+.secondary-button:hover{
+  background-color: #9747FF;
+  color: #00033D;
 }
 
 .column{

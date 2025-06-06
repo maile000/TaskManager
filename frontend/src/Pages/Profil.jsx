@@ -60,7 +60,7 @@ function Profil() {
       <div className='row profil-block'>
         <div className='column'>
           <div dangerouslySetInnerHTML={{ __html: avatarSvg }} style={{width:"100px"}}/>
-          <button  onClick={() => setIsEditing(!isEditing)}>
+          <button  onClick={() => setIsEditing(!isEditing)} className='secondary-button'>
               edit
             </button>
              
@@ -75,7 +75,11 @@ function Profil() {
       </div>
       {isEditing && (
         <div>
-          <button onClick={() => setIsEditing(!isEditing)}>X</button>
+          <button onClick={() => setIsEditing(!isEditing)} 
+            className='button' 
+            >
+              X
+          </button>
           <AvatarOptionen onAvatarSelected={handleAvatarUpdated} />
         </div>
       )}

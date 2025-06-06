@@ -4,6 +4,7 @@ import axios from "axios";
 import InviteModal from "../Component/InviteModal";
 import Sidebar from "../Component/SideBar";
 import "./Style/TeamPages.css";
+import GlasBackground from "../Assets/glas1.png";
 
 function TeamPage() {
   const { teamId } = useParams();
@@ -66,7 +67,7 @@ function TeamPage() {
   }
 
   return (
-    <div className="teampage">
+    <div className="teampage" style={{ backgroundImage: `url(${GlasBackground}) ` }}>
       <Sidebar />
       <div className="column team-uebersicht-div">
         <h1>{team.name}</h1>
@@ -119,7 +120,7 @@ function TeamPage() {
           )}
         </div>
         <div>
-          <button className="button" onClick={() => setEditMode(!editMode)}>
+          <button className="secondary-button" onClick={() => setEditMode(!editMode)}>
             {editMode ? "Abbrechen" : "Rollen bearbeiten"}
           </button>
             {editMode && (
@@ -139,7 +140,7 @@ function TeamPage() {
                         )
                       )
                     );
-                    window.location.reload(); // alternativ: Team-Daten neu laden
+                    window.location.reload();
                   } catch (err) {
                     console.error("Fehler beim Speichern:", err);
                     alert("Fehler beim Speichern der Änderungen");

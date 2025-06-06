@@ -81,7 +81,7 @@ function Register({ setUser }) {
           </button>
         </form>
         <p>
-          You have an account? <a href="/login">Login here</a>.
+          Du hast ein Account? <a href="/login">Login hier</a>.
         </p>
       </div>
     </div>

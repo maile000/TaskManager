@@ -5,6 +5,7 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    padding-bottom: 30px;
 } 
 
 .home-grid{
@@ -14,27 +15,29 @@
     gap: 30px;
     height: 80vh;
     width: 90vw;
+    margin: 30px 30px 60px 30px;
 }
 
 .item{
     border-radius: 15px;
     padding: 25px;
+    background: rgba(0, 3, 61, 0.5);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px); 
+    border: none;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .item1{
     grid-column: span 2;
     grid-row: span 2;
-    background-color: #00033D;
-    
 }
 
 .item2{
-    background: #00033D;
     color: #FFCCF2;
 }
 
 .item3{
-    background: #00033D;
 }
 
 @media (max-width: 600px) {

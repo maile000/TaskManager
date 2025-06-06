@@ -36,7 +36,7 @@ function Team() {
   }
   // className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}
   return (
-    <div >
+    <div className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}>
       <div style={{margin:"80px"}}>
         <div className="column team-managment-div">
           <h1>Team Management</h1>

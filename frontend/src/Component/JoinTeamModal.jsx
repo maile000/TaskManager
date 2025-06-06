@@ -39,9 +39,12 @@ const JoinTeamModal = ({ onClose, onJoin }) => {
           value={inviteCode}
           onChange={(e) => setInviteCode(e.target.value)}
           placeholder="Einladungscode eingeben"
+          className="input-modal"
         />
-        <button onClick={handleJoinTeam} className="button">Beitreten</button>
-        <button onClick={onClose} className="button" >Abbrechen</button>
+        <div className="modal-button-div">       
+          <button onClick={handleJoinTeam} className="button">Beitreten</button>
+          <button onClick={onClose} className="secondary-button" >Abbrechen</button>
+        </div>
       </div>
     </div>
   );

@@ -5,7 +5,7 @@
     justify-content: center;
     align-items: center;
     height: 20rem;
-    width: 100%;
+    width: 100vw;
 }
 
 .avatar-div{
@@ -21,8 +21,12 @@
 .avatar-card{
     cursor: pointer;
     padding: 10px;
+    background: rgba(0, 3, 61, 0.5);
+    backdrop-filter: blur(10px) saturate(180%);
+    -webkit-backdrop-filter: blur(10px) saturate(180%);
     border-radius: 15px;
-    box-shadow: -5px -5px 30px #F2E6EE, 5px 5px 30px black;
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .avatar-option{

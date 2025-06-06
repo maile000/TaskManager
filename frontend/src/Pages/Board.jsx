@@ -215,7 +215,6 @@ const handleDragEnd = async (event) => {
 
   } catch (error) {
     console.error("Fehler beim Aktualisieren des Task-Status:", error);
-    // Falls Fehler, Zustand zurücksetzen
     fetchTasks();
   }
 };
@@ -223,15 +222,15 @@ const handleDragEnd = async (event) => {
   return (
     <div className="board-background">
       <Sidebar defaultOpen={false} />
-        <div>
-          <div className="column">
-            <div className="row" style={{alignItems:"center"}}>
-              <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
+      <div>
+        <div className="column">
+          <div className="row board-div-button">
+            <button onClick={() => setCreateTaskOpen(true)} className="button task-btn">
               Task erstellen
-              </button>
-              {isCreateTaskOpen && (
+            </button>
+            {isCreateTaskOpen && (
                 <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
-              )}
+            )}
               <div className="collapsible-wrapper">
                 <button className="toggle-btn" onClick={toggle}>
                   {isOpen ? '◀  close' : '▶ Filter'}
@@ -282,7 +281,7 @@ const handleDragEnd = async (event) => {
                   </select>
 
                   {/* Zurücksetzen */}
-                  <button className="button reset-btn"
+                  <button className="secondary-button reset-btn"
                     onClick={() => setFilters(initialFilters)}>
                       Filter zurücksetzen
                   </button>
