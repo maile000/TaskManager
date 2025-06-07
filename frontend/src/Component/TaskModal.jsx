@@ -14,19 +14,22 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
   const [priority_flag, setFlag] = useState("");
   const [deadline, setDeadline] = useState("");
   const [projects, setProjects] = useState([]);
-  const [projectId, setProjectId] = useState(null);  
+  const [projectId, setProjectId] = useState("");
+  const [loadingProjects, setLoadingProjects] = useState(false);
+  const [errorProjects, setErrorProjects] = useState(null);
+  const [showNewProjectInput, setShowNewProjectInput] = useState(false);
+  const [newProjectName, setNewProjectName] = useState("");
 
   useEffect(() => {
-    if (task) {
-      setTitle(task.title || "");
-      setDescription(task.description || "");
-      setStatus(task.status || "To Do");
-      setAssignedTo(task.assigned_to || "");
-      setFlag(task.priority_flag || "Low");
-      setDeadline(task.deadline ? task.deadline.split("T")[0] : "");
-      setProjectId(task.project_id || null);
-    }
-  }, [task]);
+    if (!isOpen || !task) return;
+    setTitle(task.title || "");
+    setDescription(task.description || "");
+    setStatus(task.status || "To Do");
+    setAssignedTo(task.assigned_to || "");
+    setFlag(task.priority_flag || "Low");
+    setDeadline(task.deadline ? task.deadline.split("T")[0] : "");
+    setProjectId(task.project_id ? String(task.project_id) : "");
+  }, [isOpen, task]);
   
   useEffect(() => {
     const fetchMembers = async () => {
@@ -43,55 +46,76 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
     };
     fetchMembers();
   }, [teamId]);
+
+  const fetchTeamProjects = async () => {
+   setLoadingProjects(true);
+     try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+          `http://localhost:5000/api/teams/${teamId}/projects`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setProjects(res.data);
+        setErrorProjects(null);
+      } catch (err) {
+          console.error("Error fetching projects:", err);
+          setErrorProjects("Projekte konnten nicht geladen werden");
+      } finally {
+        setLoadingProjects(false);
+      }
+  };
   
   useEffect(() => {
-    const fetchProjects = async () => {
-      if (!isEditing) return;
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`http://localhost:5000/api/teams/${teamId}/projects`, {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-        setProjects(res.data.projects || []);
-      } catch (err) {
-        console.error("❌ Fehler beim Laden der Projekte:", err);
-      }
-    };
-    fetchProjects();
-  }, [isEditing, teamId]);
+    if (isOpen) {
+      fetchTeamProjects();
+    }
+  }, [isOpen, teamId]);
   
-  if (!isOpen || !task) {
-    return null;
-  }
-  
-  const handleSaveChanges = async () => {
+  const handleCreateProject = async () => {
+    if (!newProjectName.trim()) return;
     try {
       const token = localStorage.getItem("token");
+      await axios.post(
+           `http://localhost:5000/api/teams/${teamId}/projects`,            { name: newProjectName },
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        setNewProjectName("");
+        setShowNewProjectInput(false);
+        fetchTeamProjects();
+      } catch (err) {
+        console.error("Error creating project:", err);
+      }
+  };
 
-      const updatedTask = {
-        title,
-        description,
-        status,
-        assigned_to: assignedTo,
-        priority_flag,
-        deadline,
-        project_id: projectId,
-      };
-
-      await axios.put(
-        `http://localhost:5000/api/teams/${teamId}/tasks/${task.id}`,
-        updatedTask,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      console.log("✅ Task erfolgreich aktualisiert!");
-
-      await refreshTaskList();
-      setIsEditing(false);
-      onClose();
-    } catch (error) {
-      console.error("❌ Fehler beim Aktualisieren der Task:", error);
-    }
+  const handleSaveChanges = async () => {
+      try {
+        const token = localStorage.getItem("token");
+    
+        const updatedTask = {
+          title,
+          description,
+          status,
+          assigned_to: assignedTo,
+          priority_flag,
+          deadline,
+          project_id: projectId ? Number(projectId) : null,
+        };
+    
+        await axios.put(
+          `http://localhost:5000/api/teams/${teamId}/tasks/${task.id}`,
+          updatedTask,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+    
+        console.log("✅ Task erfolgreich aktualisiert!");
+    
+        await refreshTaskList();
+        
+        setIsEditing(false);
+        onClose();
+      } catch (error) {
+        console.error("❌ Fehler beim Aktualisieren der Task:", error);
+      }
   };
 
   const handleDelete = async () => {
@@ -207,36 +231,53 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
           </div>
           <div className="label-task">
             <label style={{ width: '100px' }}><strong>Projekt:</strong></label>
-              {isEditing ? (
-                <>
-                <br/>
-                  {projects.length > 0 ? (
-                    <select value={projectId || ""} onChange={(e) => setProjectId(e.target.value || null)}>
-                      <option value="">-- Kein Projekt --</option>
-                      {projects.map((proj) => (
-                        <option key={proj.id} value={proj.id}>
-                          {proj.name}
-                        </option>
-                      ))}
-                    </select>
-                  ) : (
-                    <div>
-                      <button
-                        className="secondary-button"
-                        onClick={() => {
-                          
-                        }}
-                      >
-                        ➕ Projekt erstellen
-                      </button>
-                    </div>
-                  )}
-                </>
-              ) : (
-                <p>
-                  {task.project_name || "Kein Projekt zugewiesen"}
-                </p>
-              )}
+            
+            {isEditing ? (
+          <>
+            {loadingProjects ? (
+              <p>Lade Projekte…</p>
+            ) : errorProjects ? (
+              <p className="error">{errorProjects}</p>
+            ) : (
+              <select
+                value={projectId}
+                onChange={e => setProjectId(e.target.value)}
+              >
+                <option value="">-- Kein Projekt --</option>
+                {projects.map(proj => (
+                  <option key={proj.id} value={String(proj.id)}>
+                    {proj.name}
+                  </option>
+                ))}
+              </select>
+            )}
+            {showNewProjectInput ? (
+              <div style={{ marginTop: '8px' }}>
+                <input
+                  type="text"
+                  placeholder="Projektname"
+                  value={newProjectName}
+                  onChange={e => setNewProjectName(e.target.value)}
+                />
+                <button onClick={handleCreateProject}>Speichern</button>
+                <button onClick={() => setShowNewProjectInput(false)}>
+                  Abbrechen
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setShowNewProjectInput(true)}
+                style={{ marginLeft: '8px' }}
+              >
+                + Neues Projekt
+              </button>
+            )}
+          </>
+        ) : (
+          <p>{task.project_name || "Kein Projekt zugewiesen"}</p>
+        )}
             </div>
             <div className="label-task">
               <label style={{ width: '100px' }}><strong>Deadline:</strong></label>

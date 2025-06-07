@@ -4,11 +4,11 @@ import "./StyleComp/Nav.css";
 function Nav({ user, onLogout }) {
     return (
         <nav className="navbar">
-            <Link to="/" className="link">Home</Link>
+            <Link to="/" className="navbar-link">Home</Link>
             {user ? (
                 <>
-                    <Link to="/profile" className="navbar-link" >Profil</Link>
                     <Link to="/team" className="navbar-link" >Team</Link>
+                    <Link to="/profile" className="navbar-link" >Profil</Link>
                     <button onClick={onLogout} className="button" >Logout</button>
                 </>
             ) : (

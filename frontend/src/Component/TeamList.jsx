@@ -33,7 +33,7 @@ const TeamList = ({ teams, setTeams }) => {
 
   return (
     <div>
-      <h2>Meine Teams</h2>
+      <h1 style={{fontSize:"xxx-large", fontWeight:"bolder", textAlign:"center", color:"#F2E6EE"}}>Meine Teams</h1>
       <div className="teams-div">
         {teams.map((team) => (
           <div>

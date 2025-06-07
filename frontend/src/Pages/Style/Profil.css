@@ -3,10 +3,14 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    background: linear-gradient(to bottom ,#F2E6EE, #977DFF);
+    color: #0033FF;
 }
 
 .profil-head{
     align-self: center;
+    font-size: xxx-large;
+    font-weight: ;
 }
 
 .profil-block{

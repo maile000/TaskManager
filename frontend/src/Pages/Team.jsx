@@ -4,7 +4,7 @@ import CreateTeamModal from "../Component/CreatTeamModal";
 import TeamList from "../Component/TeamList";
 import JoinTeamModal from "../Component/JoinTeamModal";
 import "./Style/Team.css";
-import GlasBackground from "../Assets/glas.jpg";
+import GlasBackground from "../Assets/glas1.png";
 
 function Team() {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
@@ -34,7 +34,6 @@ function Team() {
   const handleCreateTeam = (newTeam) => {
     setTeams([...teams, newTeam]);
   }
-  // className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}
   return (
     <div className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}>
       <div style={{margin:"80px"}}>

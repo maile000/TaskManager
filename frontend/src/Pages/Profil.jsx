@@ -56,9 +56,9 @@ function Profil() {
   
   return (
     <div className='column profil-page'>
-      <h2 className='profil-head'>Mein Profil</h2>
+      <h1 className='profil-head'>Mein Profil</h1>
       <div className='row profil-block'>
-        <div className='column'>
+        <div className='column' style={{alignItem:"center"}}>
           <div dangerouslySetInnerHTML={{ __html: avatarSvg }} style={{width:"100px"}}/>
           <button  onClick={() => setIsEditing(!isEditing)} className='secondary-button'>
               edit
@@ -75,11 +75,13 @@ function Profil() {
       </div>
       {isEditing && (
         <div>
-          <button onClick={() => setIsEditing(!isEditing)} 
-            className='button' 
-            >
-              X
-          </button>
+          <div style={{display: "flex", justifyContent: "flex-end"}}>
+            <button onClick={() => setIsEditing(!isEditing)} 
+              className='button' 
+              >
+                X
+            </button>
+          </div>
           <AvatarOptionen onAvatarSelected={handleAvatarUpdated} />
         </div>
       )}

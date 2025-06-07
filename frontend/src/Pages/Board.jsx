@@ -118,19 +118,21 @@ useEffect(() => {
         ...filters,
         userId
       };
-
+  
       const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/tasks`, {
-        params: { ...filters,  userId },
+        params: { ...filters, userId },
         headers: { Authorization: `Bearer ${token}` },
       });
-
+  
       const groupedTasks = statuses.map((status) => ({
         id: status,
         title: status,
-        tasks: response.data.filter((task) => task.status === status),
+        tasks: response.data.map(task => ({
+          ...task,
+          project_name: projects.find(p => p.id === task.project_id)?.name || "Kein Projekt"
+        })).filter((task) => task.status === status),
       }));
-      console.log("▶️ fetching tasks with params:", params);
-
+  
       setColumns(groupedTasks);
     } catch (error) {
       console.error("❌ Fehler beim Laden der Tasks:", error);
@@ -168,7 +170,6 @@ const handleDragEnd = async (event) => {
   const activeId = active.id.replace("task-", "");
   let overContainer = over.id;
 
-  // Finde die Ziel-Spalte
   if (overContainer.startsWith("task-")) {
     const taskId = overContainer.replace("task-", "");
     const foundColumn = columns.find((col) => 
@@ -177,7 +178,6 @@ const handleDragEnd = async (event) => {
     overContainer = foundColumn?.id || columns[0].id;
   }
 
-  // Finde die ursprüngliche Spalte
   const oldColumn = columns.find((col) => 
     col.tasks.some((task) => task.id.toString() === activeId)
   );
@@ -210,6 +210,7 @@ const handleDragEnd = async (event) => {
         return col;
       })
     );
+    setRefreshTrigger(prev => prev + 1);
 
     console.log("Task erfolgreich verschoben und Punkte aktualisiert");
 

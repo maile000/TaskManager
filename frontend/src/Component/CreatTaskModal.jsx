@@ -183,7 +183,7 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
                     value={newProjectName}
                     onChange={(e) => setNewProjectName(e.target.value)}
                     placeholder="Projektname"
-                    required
+                    
                   />
                   <button
                     type="button"

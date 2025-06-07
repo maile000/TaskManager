@@ -39,7 +39,7 @@ const Sidebar = ({ defaultOpen = true }) => {
       
       {isOpen && (
         <div>
-          <h1>{teamName}</h1>
+          <h3>{teamName}</h3>
           <nav className="sidebar-nav">
             <Link className="sidebar-link" to={`/team/${teamId}/dashboard`}>Board</Link>
             <Link className="sidebar-link" to={`/team/${teamId}/teamranking`}>Ranking</Link>

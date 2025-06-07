@@ -601,3 +601,44 @@ exports.getUserTaskPoints = async (req, res) => {
     return res.status(500).json({ error: "Interner Serverfehler" });
   }
 };
+
+exports.getWeeklyDeadlines = async (req, res) => {
+  const pool = req.app.locals.pool;
+  const userId = req.userId;
+
+  // 1. Start und Ende der aktuellen Woche berechnen (Montag 00:00 bis Sonntag 23:59:59)
+  const now = new Date();
+  const day = now.getDay(); // Sonntag=0, Montag=1, …
+  const diffToMonday = (day + 6) % 7; 
+  const startOfWeek = new Date(now);
+  startOfWeek.setDate(now.getDate() - diffToMonday);
+  startOfWeek.setHours(0, 0, 0, 0);
+  const endOfWeek = new Date(startOfWeek);
+  endOfWeek.setDate(startOfWeek.getDate() + 6);
+  endOfWeek.setHours(23, 59, 59, 999);
+
+  try {
+    const result = await pool.query(
+       `SELECT 
+          t.deadline,
+          t.title AS task_name,
+          t.team_id,
+          tm.name     AS team_name
+       FROM tasks t
+       JOIN team_members tm2 
+         ON t.team_id = tm2.team_id
+        AND tm2.user_id = $1
+       JOIN teams tm 
+         ON t.team_id = tm.id
+       WHERE t.assigned_to = $1
+         AND t.deadline BETWEEN $2 AND $3
+       ORDER BY t.deadline ASC`,
+      [userId, startOfWeek, endOfWeek]
+    );
+
+    return res.json({ deadlines: result.rows });
+  } catch (err) {
+    console.error("Fehler in getWeeklyDeadlines:", err);
+    return res.status(500).json({ error: "Interner Serverfehler" });
+  }
+};
