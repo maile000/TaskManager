@@ -8,6 +8,8 @@ const teamRoutes = require("./routes/teamRoutes");
 const taskRoutes = require("./routes/taskRoutes");
 const avatarRoutes = require("./routes/avatarRoute");
 const commentRoutes = require("./routes/commentRoute");
+const streaktRoutes = require("./routes/streakRoute");
+const levelRoutes = require("./routes/levelRoute");
 
 const app = express();
 app.use(cors());
@@ -29,6 +31,8 @@ app.use("/api", teamRoutes);
 app.use("/api", taskRoutes);
 app.use("/api", avatarRoutes);
 app.use("/api", commentRoutes);
+app.use("/api", streaktRoutes);
+app.use("/api", levelRoutes);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {

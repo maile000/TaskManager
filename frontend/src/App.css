@@ -35,6 +35,11 @@
   }
 }
 
+body{
+  overflow-x: hidden;
+  overscroll-behavior-x: none;
+}
+
 .button{
   background-color: #9747FF;
   color: #00033D;

@@ -571,24 +571,48 @@ exports.getUserTaskPoints = async (req, res) => {
   const pool = req.app.locals.pool;
   const userId = req.userId;
 
+  // Verbindung holen, um Transaktion zu starten
+  const client = await pool.connect();
   try {
-    // 1. Punkte aus  Tasks holen (gruppiert nach Team)
-    const taskPointsRes = await pool.query(
+    await client.query("BEGIN");
+
+    // 1. Punkte aus Tasks live berechnen
+    const taskPointsRes = await client.query(
       `SELECT 
-         t.team_id,
-         tm.name AS team_name,
-         COALESCE(SUM(t.points), 0) AS task_points
+         COALESCE(SUM(
+           CASE t.status
+             WHEN 'Planning'    THEN 10
+             WHEN 'To Do'       THEN 200
+             WHEN 'In Progress' THEN 300
+             WHEN 'Done'        THEN 500
+             ELSE 0
+           END
+           +
+           CASE t.priority_flag
+             WHEN 'Low'      THEN 10
+             WHEN 'Medium'   THEN 30
+             WHEN 'High'     THEN 50
+             WHEN 'Critical' THEN 100
+             ELSE 0
+           END
+         ), 0) AS total_task_points
        FROM tasks t
-       JOIN teams tm ON t.team_id = tm.id
-       WHERE t.assigned_to = $1
-       GROUP BY t.team_id, tm.name
-       ORDER BY tm.name`,
+       WHERE t.assigned_to = $1;`,
       [userId]
     );
+    const totalTaskPoints = parseInt(taskPointsRes.rows[0].total_task_points, 10);
 
-    // 2. Gesamtsumme aller Task-Punkte berechnen
-    const totalTaskPoints = taskPointsRes.rows.reduce((sum, row) => sum + parseInt(row.task_points), 0);
+    // 2. users.total_points updaten
+    await client.query(
+      `UPDATE users
+         SET total_points = $1
+       WHERE id = $2;`,
+      [totalTaskPoints, userId]
+    );
 
+    await client.query("COMMIT");
+
+    // 3. Response wie gewohnt zurückgeben
     return res.json({
       total_points: totalTaskPoints,
       points_by_team: taskPointsRes.rows,
@@ -597,10 +621,14 @@ exports.getUserTaskPoints = async (req, res) => {
       }
     });
   } catch (err) {
+    await client.query("ROLLBACK");
     console.error("Fehler in getUserTaskPoints:", err);
     return res.status(500).json({ error: "Interner Serverfehler" });
+  } finally {
+    client.release();
   }
 };
+
 
 exports.getWeeklyDeadlines = async (req, res) => {
   const pool = req.app.locals.pool;

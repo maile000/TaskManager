@@ -4,8 +4,8 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    height: 20rem;
     width: 100vw;
+    font-size: xx-large;
 }
 
 .avatar-div{
@@ -14,8 +14,7 @@
     justify-content: center;
     gap: 2rem;
     padding: 25px;
-    overflow: visible;
-    position: relative;
+    height: fit-content;
 }
 
 .avatar-card{

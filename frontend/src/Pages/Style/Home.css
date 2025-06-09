@@ -1,6 +1,6 @@
 .home-background{
     background: linear-gradient(to bottom ,#977DFF, #00033D);
-    height: 100vh;
+    min-height: 100vh;
     width: auto;
     display: flex;
     justify-content: center;
@@ -13,12 +13,13 @@
     grid-template-columns: repeat(3, 1fr);
     grid-template-rows: repeat(2, auto);
     gap: 30px;
-    height: 80vh;
+    min-height: 80vh;
     width: 90vw;
     margin: 30px 30px 60px 30px;
 }
 
 .item{
+    max-width: 90vw;
     border-radius: 15px;
     padding: 25px;
     background: rgba(0, 3, 61, 0.5);

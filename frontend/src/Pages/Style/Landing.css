@@ -8,15 +8,14 @@
 
 .landing-block1{
     display: flex;
+    flex-direction: row;
     justify-content: space-around;
     align-items: center;
     flex-wrap: wrap-reverse;
     background-color: #f2e6ee;
-    height: 100vh;
+    min-height: 100vh;
     max-height: 500px;
-    width: 85vw;
-    border-radius: 15px;
-    margin: 30px;
+    width: 100vw;
 }
 
 
@@ -32,12 +31,7 @@
 .header-welcome{
     font-size: 32px;
     font-weight: bolder;
-}
-
-@media screen and (max-width: 767px) {
-    .header-welcome {
-        font-size: 17px;
-    }
+    line-height: 0.6em;
 }
 
 .landing-block3{
@@ -56,7 +50,7 @@
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);
     border-radius: 15px;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    border: none;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     width: 200px;
     height: 150px;
@@ -68,6 +62,8 @@
     transform-style: preserve-3d;
     backface-visibility: hidden;
     cursor: pointer;
+    color: #f2e6ee;
+    font-size: 18px;
 }
 
 .landing-block3-div:hover{
@@ -76,10 +72,13 @@
 
 .landing-block3-div.active {
     transform: scale(1.5) rotateY(360deg);
-    background-color: #f0f0f0;
+    background-color: #0600AB;
+    color: #977DFF;
     z-index: 999;
     display: flex;
     position: relative;
+    align-items: center;
+    padding: 15px;
 }
   
 .landing-block3-div.shrink {
@@ -100,4 +99,40 @@
 
 .landing-text-block{
     margin: 50px;
+}
+
+.landing-block-text{
+    width: 650px;
+    max-width: 80%;
+    text-align: center;
+    padding: 50px;
+    line-height: 3em;
+}
+
+.landing-block2-img{
+    width: 100vw;
+    height: 70vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.landing-block2-header{
+    text-align: center;
+    font-size: 200px;
+    color: #f2e6ee;
+}
+@media screen and (max-width: 767px) {
+    .header-welcome {
+        font-size: 25px;
+        line-height: normal;
+        padding: 30px;
+        
+    }
+    .landing-block2-header{
+        font-size: xxx-large;
+    }
+    .landing-block1{
+        flex-wrap: wrap-reverse;
+    }
 }

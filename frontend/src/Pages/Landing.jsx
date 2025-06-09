@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 import "./Style/Landing.css";
 import KreuzWort from "../Assets/KreuzWort.svg";
+import Laptop from "../Assets/laptop.png";
 
 const buttonData = [
-    { label: 'Option 1', activeLabel: 'Mehr Infos zu 1' },
-    { label: 'Option 2', activeLabel: 'Details zu 2' },
-    { label: 'Option 3', activeLabel: 'Erklärung 3' },
+    { label: 'Projektarbeit', activeLabel: 'Behalte alle Projekte im Blick – ohne Multitasking-Wahnsinn. '},
+    { label: 'Option 2', activeLabel: 'Prüfungen, Hausarbeiten, Nebenjob – organisiert durchs Chaos.' },
+    { label: 'Option 3', activeLabel: 'Analysiere deine Produktivität & belohne dich. Motivation made easy.' },
   ];
+
 
 function Landing () {
     const [activeButton, setActiveButton] = useState(null);
@@ -57,12 +59,14 @@ function Landing () {
                     <img src={KreuzWort} className="landing-img"/>
                 </div>
                 <div className='column header-welcome'>
-                  <h1>Welcome </h1>
-                  <h1>to Karen</h1>
+                  <h1>Willkommen </h1>
+                  <h1>zu deinem Task-Manager</h1>
                 </div>
             </div>
             <div className='landing-block2'>
-                
+              <div className='landing-block2-img' style={{ backgroundImage: `url(${Laptop}) `}}>
+                <h1 className='landing-block2-header'>TASK</h1>
+              </div> 
             </div>
             <div className="landing-block3 fade-in"
             ref={(el) => (sectionRefs.current[2] = el)} >
@@ -81,15 +85,11 @@ function Landing () {
                     </button>
                 ))}
             </div>
-            <div className=" fade-in"
+            <div className="landing-block-text fade-in"
             ref={(el) => (sectionRefs.current[3] = el)} >
-              Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua. At vero eos et accusam et justo duo dolores et ea rebum. Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet.  
-
-Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat.  
-
-Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero eros et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi.  
-
-Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum. Lorem
+              <h1>
+                Mit denem Task Managers behältst du endlich den Überblick über deine Aufgaben, Projekte und Ziele – ohne Chaos, verpasste Deadlines oder überfüllte To-Do-Listen.
+              </h1> 
           </div>
         </div>
     );

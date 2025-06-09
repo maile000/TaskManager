@@ -9,8 +9,8 @@
 
 .profil-head{
     align-self: center;
-    font-size: xxx-large;
-    font-weight: ;
+    font-size: xx-large;
+    font-weight: bolder;
 }
 
 .profil-block{
@@ -18,8 +18,9 @@
     align-content: center;
     justify-content: center;
     align-items: center;
-    width: 50%;
-    height: 250px;
+    min-width: 50%;
+    max-width: 90%;
+    height: 450px;
     background: rgba(0, 3, 61, 0.5);
     backdrop-filter: blur(10px) saturate(180%);
     -webkit-backdrop-filter: blur(10px) saturate(180%);

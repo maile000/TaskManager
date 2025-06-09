@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import AvatarOptionen from "../Component/AvatarOptionen";
 import axios from "axios";
 import "./Style/Profil.css";
+import Level from "../Component/LevelProgress";
 
 function Profil() {
   const [avatarSvg, setAvatarSvg] = useState('');
@@ -58,20 +59,25 @@ function Profil() {
     <div className='column profil-page'>
       <h1 className='profil-head'>Mein Profil</h1>
       <div className='row profil-block'>
-        <div className='column' style={{alignItem:"center"}}>
+        <div className='column' style={{alignItems:"center"}}>
           <div dangerouslySetInnerHTML={{ __html: avatarSvg }} style={{width:"100px"}}/>
           <button  onClick={() => setIsEditing(!isEditing)} className='secondary-button'>
               edit
             </button>
-             
         </div>
-        <div className='profil-info-div'>
-            <p>Name:</p>
+        <div className='column' style={{alignItems:"center"}}>
+           <div className='profil-info-div'>
+            <div className='row' style={{alignItems:"center"}}>
+              <p>Name:</p>
            {user && <p className='profil-info'>{user.name}</p>}
-           <p>E-Mail:</p>
+            </div>
+            <div className='row' style={{alignItems:"center"}}>
+              <p>E-Mail:</p>
            {user && <p className='profil-info'>{user.email}</p>}
+            </div>
         </div>
-        
+        <Level/>
+        </div>
       </div>
       {isEditing && (
         <div>
