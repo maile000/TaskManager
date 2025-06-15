@@ -634,24 +634,30 @@ exports.getWeeklyDeadlines = async (req, res) => {
   const pool = req.app.locals.pool;
   const userId = req.userId;
 
-  // 1. Start und Ende der aktuellen Woche berechnen (Montag 00:00 bis Sonntag 23:59:59)
+  // 1. Start der aktuellen Woche (Montag 00:00)
   const now = new Date();
-  const day = now.getDay(); // Sonntag=0, Montag=1, …
+  const day = now.getDay(); 
   const diffToMonday = (day + 6) % 7; 
   const startOfWeek = new Date(now);
   startOfWeek.setDate(now.getDate() - diffToMonday);
   startOfWeek.setHours(0, 0, 0, 0);
+
+  // 2. Ende der aktuellen Woche (Sonntag 23:59:59)
   const endOfWeek = new Date(startOfWeek);
   endOfWeek.setDate(startOfWeek.getDate() + 6);
   endOfWeek.setHours(23, 59, 59, 999);
 
   try {
     const result = await pool.query(
-       `SELECT 
-          t.deadline,
-          t.title AS task_name,
-          t.team_id,
-          tm.name     AS team_name
+      `SELECT 
+         t.deadline,
+         t.title AS task_name,
+         t.team_id,
+         tm.name AS team_name,
+         CASE 
+           WHEN t.deadline < NOW() THEN 'overdue'
+           ELSE 'upcoming'
+         END AS status
        FROM tasks t
        JOIN team_members tm2 
          ON t.team_id = tm2.team_id
@@ -659,8 +665,14 @@ exports.getWeeklyDeadlines = async (req, res) => {
        JOIN teams tm 
          ON t.team_id = tm.id
        WHERE t.assigned_to = $1
-         AND t.deadline BETWEEN $2 AND $3
-       ORDER BY t.deadline ASC`,
+         AND (
+           -- Fällige (überfällige) Tasks ODER Deadline diese Woche
+           t.deadline < NOW() 
+           OR t.deadline BETWEEN $2 AND $3
+         )
+         AND t.status != 'Done'
+       ORDER BY 
+         t.deadline ASC`,
       [userId, startOfWeek, endOfWeek]
     );
 

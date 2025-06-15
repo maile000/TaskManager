@@ -54,10 +54,8 @@ function Landing () {
 
     return (
         <div className="landing">
-            <div className="landing-block1">
-                <div className="landing-block1-div">
+            <div className="landing-block1">               
                     <img src={KreuzWort} className="landing-img"/>
-                </div>
                 <div className='column header-welcome'>
                   <h1>Willkommen </h1>
                   <h1>zu deinem Task-Manager</h1>

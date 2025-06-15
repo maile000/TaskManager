@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "./StyleComp/LogReg.css";
@@ -14,28 +14,29 @@ function Login({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("📌 Login-Daten:", formData);
+    
     try {
       const res = await axios.post("http://localhost:5000/api/login", formData);
-      console.log("📌 Server-Antwort:", res.data); 
-
-      if (res && res.data && res.data.token && res.data.user) {
+      
+      if (res?.data?.user) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
-        setUser(true);
+        setUser(res.data.user);
         navigate("/");
-      } else {
-        throw new Error("Ungültige Serverantwort");
       }
     } catch (error) {
-      console.error("❌ Login-Fehler:", error);
-      alert(error.response?.data?.error || "Fehler beim Login. Bitte versuche es erneut.");
+      console.error("Login-Fehler:", error);
+      alert(error.response?.data?.error || "Login fehlgeschlagen");
     }
   };
 
+
+
   return (
     <div className="log-reg" style={{ backgroundImage: `url(${LogReg})` }}>
-      <div className="log-block">
+      {/* Login Formular */}
+      <div className="log-block" >
+
         <form onSubmit={handleSubmit}>
           <input
             type="email"

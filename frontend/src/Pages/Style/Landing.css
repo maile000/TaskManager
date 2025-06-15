@@ -21,9 +21,8 @@
 
 .landing-img{
     display: flex;
-    width: auto;
-    height: 65vh;
-    max-height: 320px;
+    width: 50vw;
+    height: auto;
     object-fit: cover;
     box-sizing: border-box;
 }
@@ -31,7 +30,7 @@
 .header-welcome{
     font-size: 32px;
     font-weight: bolder;
-    line-height: 0.6em;
+    width: 50vw;
 }
 
 .landing-block3{
@@ -122,6 +121,7 @@
     font-size: 200px;
     color: #f2e6ee;
 }
+
 @media screen and (max-width: 767px) {
     .header-welcome {
         font-size: 25px;
@@ -134,5 +134,14 @@
     }
     .landing-block1{
         flex-wrap: wrap-reverse;
+    }
+}
+
+@media screen and (max-width: 375px) {
+    .header-welcome {
+        font-size: 18px;
+    }
+    .landing-img{
+        width: 80vw;
     }
 }

@@ -60,3 +60,8 @@
     }
   }
   
+@media (max-width: 400px) {
+  .avatar-option{
+    width: 80px;
+  }
+}

@@ -76,7 +76,9 @@ function Profil() {
            {user && <p className='profil-info'>{user.email}</p>}
             </div>
         </div>
-        <Level/>
+          <div className="level">
+          <Level />
+          </div>
         </div>
       </div>
       {isEditing && (

@@ -15,39 +15,34 @@ function Register({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     try {
+      // 1. Registrierung
       const res = await axios.post("http://localhost:5000/api/register", formData);
-
-      if (res && res.data) {
-        console.log("✅ Erfolgreich registriert:", res.data);
+      
+      if (!res?.data?.token) {
+        // 2. Automatischer Login nach Registrierung
         const loginRes = await axios.post("http://localhost:5000/api/login", {
           email: formData.email,
-          password: formData.password,
+          password: formData.password
         });
-
-        if (loginRes && loginRes.data && loginRes.data.token && loginRes.data.user) {
+        
+        if (loginRes?.data?.token) {
           localStorage.setItem("token", loginRes.data.token);
           localStorage.setItem("user", JSON.stringify(loginRes.data.user));
-
           setUser(loginRes.data.user);
-
           navigate("/");
-          console.log("🔑 Automatisch eingeloggt:", loginRes.data.user);
-        } else {
-          throw new Error("Automatischer Login fehlgeschlagen");
         }
       } else {
-        throw new Error("Ungültige Serverantwort");
+        // Falls der Register-Endpoint bereits den Token zurückgibt
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+        setUser(res.data.user);
+        navigate("/");
       }
     } catch (error) {
-      console.error("❌ Registrierungs-Fehler:", error);
-
-      if (error.response) {
-        console.error("📌 Fehlerdetails:", error.response.data);
-      } else {
-        console.error("❌ Netzwerkfehler oder Server nicht erreichbar.");
-      }
+      console.error("Registrierungsfehler:", error);
+      alert(error.response?.data?.error || "Registrierung fehlgeschlagen");
     }
   };
 

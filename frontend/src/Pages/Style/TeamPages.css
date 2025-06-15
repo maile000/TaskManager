@@ -11,6 +11,7 @@
 .team-uebersicht-div{
     align-items: center;
     gap: 30px;
+    padding-left: 80px;
 }
 
 .team-members{

@@ -12,14 +12,17 @@ function Home() {
     year: "numeric",
   });
 
-  const [deadlines, setDeadlines] = useState([]);
+  const [deadlines, setDeadlines] = useState({
+    overdue: [],
+    upcoming: []
+  });
   const [loadingDeadlines, setLoadingDeadlines] = useState(true);
   const [errorDeadlines, setErrorDeadlines] = useState(null);
 
   const [points, setPoints] = useState({
-       total_points: 0,
-       points_by_team: []
-     });
+    total_points: 0,
+    points_by_team: []
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -27,15 +30,14 @@ function Home() {
   const [loadingStreak, setLoadingStreak] = useState(true);
   const [errorStreak, setErrorStreak] = useState(null);
 
+  // Punkte laden
   const fetchPoints = async () => {
     try {
       setLoading(true);
       const token = localStorage.getItem("token");
       const response = await axios.get(
         "http://localhost:5000/api/user/points",
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
       setPoints({
         total_points: response.data.total_points,
@@ -50,43 +52,55 @@ function Home() {
     }
   };
 
+  // Deadlines laden (jetzt mit overdue/upcoming)
   const fetchDeadlines = async () => {
-    try {
-      setLoadingDeadlines(true);
-      const token = localStorage.getItem("token");
-        const res = await axios.get(
-          "http://localhost:5000/api/user/tasks/deadlines/weekly",
-      { headers: { Authorization: `Bearer ${token}` } }
-      );
-      const sorted = res.data.deadlines.sort((a, b) =>
-      new Date(a.deadline) - new Date(b.deadline)
-      );
-      setDeadlines(sorted);
-      setErrorDeadlines(null);
-    } catch (err) {
-      console.error("Error fetching deadlines:", err);
-      setErrorDeadlines("Fehler beim Laden der Deadlines");
-    } finally {
-      setLoadingDeadlines(false);
-    }
-  };
-
-  const fetchStreak = async () => {
-      try {
-        setLoadingStreak(true);
-        const token = localStorage.getItem("token");
-        const res = await axios.get(
-          "http://localhost:5000/api/streak",
-          { headers: { Authorization: `Bearer ${token}` } }
-        );
-        setStreakData(res.data);
-        setErrorStreak(null);
-      } catch (err) {
-        console.error("Error fetching streak:", err);
-        setErrorStreak("Fehler beim Laden des Streaks");
-      } finally {
-        setLoadingStreak(false);
+  try {
+    setLoadingDeadlines(true);
+    const token = localStorage.getItem("token");
+    const res = await axios.get(
+      "http://localhost:5000/api/user/tasks/deadlines/weekly",
+      { 
+        headers: { Authorization: `Bearer ${token}` },
+        params: { debug: true } // Add this if backend supports it
       }
+    );
+    
+    const grouped = {
+      overdue: res.data.deadlines.filter(d => d.status === 'overdue'),
+      upcoming: res.data.deadlines.filter(d => d.status === 'upcoming')
+    };
+    
+    setDeadlines(grouped);
+    setErrorDeadlines(null);
+  } catch (err) {
+    console.error("Detailed deadline fetch error:", {
+      message: err.message,
+      response: err.response?.data, // This contains server error details
+      config: err.config
+    });
+    setErrorDeadlines(err.response?.data?.message || "Fehler beim Laden der Deadlines");
+  } finally {
+    setLoadingDeadlines(false);
+  }
+};
+
+  // Streak laden
+  const fetchStreak = async () => {
+    try {
+      setLoadingStreak(true);
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        "http://localhost:5000/api/streak",
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
+      setStreakData(res.data);
+      setErrorStreak(null);
+    } catch (err) {
+      console.error("Error fetching streak:", err);
+      setErrorStreak("Fehler beim Laden des Streaks");
+    } finally {
+      setLoadingStreak(false);
+    }
   };
 
   useEffect(() => {
@@ -95,15 +109,9 @@ function Home() {
     fetchStreak();
   }, []);
 
-  if (loading) {
-    return <div className="loading">Lade Punkte …</div>;
-  }
+  if (loading) return <div className="loading">Lade Punkte …</div>;
+  if (error) return <div className="error">{error}</div>;
 
-  if (error) {
-    return <div className="error">{error}</div>;
-  }
-
-  // Wenn points da ist, kannst du es so rendern:
   return (
     <div className="home-background">
       <div className="home-grid">
@@ -111,7 +119,6 @@ function Home() {
           <StatusPie />
         </div>
         <div className="item item2">
-          {/* 1. Gesamtsumme aller Punkte */}
           <div className="points-div column">
             <div className="total-points">
               <strong>{points.total_points} Punkte</strong> 
@@ -120,15 +127,9 @@ function Home() {
           </div>
         </div>
         <div className="item item3">
-          <div
-            style={{
-              fontSize: "20px",
-              fontWeight: "bold",
-              textAlign: "center",
-              color: "white",
-            }}
-          >
+          <div className="deadlines-container">
             <p>heute {datumString}</p>
+            
             {loadingStreak ? (
               <p>Lade Streak …</p>
             ) : errorStreak ? (
@@ -143,36 +144,62 @@ function Home() {
               <p>Lade Deadlines …</p>
             ) : errorDeadlines ? (
               <p className="error">{errorDeadlines}</p>
-            ) : deadlines.length === 0 ? (
-              <p>diese Woche keine Deadlines</p>
             ) : (
-              <ul className="weekly-deadlines">
-                {deadlines.map((d) => (
-                  <li key={`${d.team_id}-${d.deadline}-${d.task_name}`}>
-                    {new Date(d.deadline).toLocaleDateString("de-DE", {
-                      day: "2-digit",
-                      month: "2-digit",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    })}{" "}
-                    – {d.task_name} (
-                    <a
-                      href={`http://localhost:3000/team/${d.team_id}/dashboard`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                    >
-                      {d.team_name}-Board
-                    </a>
-                    )
-                  </li>
-                ))}
-              </ul>
+              <>
+                {deadlines.overdue.length > 0 && (
+                  <div className="deadline-section">
+                    <h3 className="deadline-header overdue">Überfällig</h3>
+                    <ul className="deadline-list">
+                      {deadlines.overdue.map((d) => (
+                        <DeadlineItem key={`overdue-${d.team_id}-${d.deadline}`} data={d} />
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {deadlines.upcoming.length > 0 && (
+                  <div className="deadline-section">
+                    <h3 className="deadline-header upcoming">Diese Woche</h3>
+                    <ul className="deadline-list">
+                      {deadlines.upcoming.map((d) => (
+                        <DeadlineItem key={`upcoming-${d.team_id}-${d.deadline}`} data={d} />
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {deadlines.overdue.length === 0 && deadlines.upcoming.length === 0 && (
+                  <p>Keine Deadlines diese Woche</p>
+                )}
+              </>
             )}
           </div>
         </div>
       </div>
     </div>
+  );
+}
+
+function DeadlineItem({ data }) {
+  return (
+    <li className="item3">
+      {new Date(data.deadline).toLocaleDateString("de-DE", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+      })}{" "}
+      – {data.task_name} (
+      <a
+        href={`http://localhost:3000/team/${data.team_id}/dashboard`}
+        target="_blank"
+        rel="noopener noreferrer"
+      >
+        {data.team_name}-Board
+      </a>
+      )
+    </li>
   );
 }
 

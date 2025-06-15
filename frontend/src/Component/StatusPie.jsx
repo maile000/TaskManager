@@ -44,7 +44,7 @@ const StatusPie = () => {
       {data.length === 0 ? (
         <p>Keine Tasks vorhanden.</p>
       ) : (
-        <PieChart width={400} height={300}>
+        <PieChart width={450} height={300} className="piechart">
           <Pie
             data={data}
             cx="50%"
@@ -53,13 +53,14 @@ const StatusPie = () => {
             label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
             outerRadius={100}
             dataKey="value"
+            className="pie"
           >
             {data.map((entry, index) => (
               <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
             ))}
           </Pie>
           <Tooltip />
-          <Legend />
+          <Legend className="legend" />
         </PieChart>
       )}
     </div>
