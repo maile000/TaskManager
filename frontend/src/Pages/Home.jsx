@@ -112,6 +112,19 @@ function Home() {
   if (loading) return <div className="loading">Lade Punkte …</div>;
   if (error) return <div className="error">{error}</div>;
 
+  document.querySelectorAll('.circle').forEach(circle => {
+    circle.addEventListener('click', () => {
+      circle.classList.remove('flipping'); 
+      void circle.offsetWidth;  
+      circle.classList.add('flipping');
+  
+      setTimeout(() => {
+        circle.classList.remove('flipping');
+      }, 600);
+    });
+  });
+
+  
   return (
     <div className="home-background">
       <div className="home-grid">
@@ -120,26 +133,33 @@ function Home() {
         </div>
         <div className="item item2">
           <div className="points-div column">
-            <div className="total-points">
-              <strong>{points.total_points} Punkte</strong> 
+            <div className="circle">
+              <strong>{points.total_points}</strong> 
+              <br/>
+              <strong>Punkte</strong>
             </div>
             <Level/>
           </div>
         </div>
         <div className="item item3">
           <div className="deadlines-container">
-            <p>heute {datumString}</p>
-            
-            {loadingStreak ? (
-              <p>Lade Streak …</p>
-            ) : errorStreak ? (
-              <p className="error">{errorStreak}</p>
-            ) : streakData ? (
-              <p>
-                Dein aktueller Streak: <strong>{streakData.streak.days} Tage</strong>  
-              </p>
-            ) : null}
-
+            <div className="row circle-div">
+              <div className="circle ">
+                <p> <strong>{datumString}<br/> heute</strong></p>
+              </div> 
+              {loadingStreak ? (
+                <p>Lade Streak …</p>
+              ) : errorStreak ? (
+                <p className="error">{errorStreak}</p>
+              ) : streakData ? (
+                <div className="circle">
+                  <p>
+                  <strong>{streakData.streak.days} Tage</strong> 
+                  <br/> 
+                  <strong>Streak</strong></p>
+                </div>
+              ) : null}
+            </div>
             {loadingDeadlines ? (
               <p>Lade Deadlines …</p>
             ) : errorDeadlines ? (
@@ -148,7 +168,7 @@ function Home() {
               <>
                 {deadlines.overdue.length > 0 && (
                   <div className="deadline-section">
-                    <h3 className="deadline-header overdue">Überfällig</h3>
+                    <h3 className="deadline-header overdue">Überfällige Task</h3>
                     <ul className="deadline-list">
                       {deadlines.overdue.map((d) => (
                         <DeadlineItem key={`overdue-${d.team_id}-${d.deadline}`} data={d} />

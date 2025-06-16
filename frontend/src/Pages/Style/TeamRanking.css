@@ -6,9 +6,9 @@
     margin-top: 40px;
    flex-wrap: wrap;
 
-  }
+ }
   
-  .podium-item {
+.podium-item {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -16,9 +16,9 @@
     padding: 10px;
     width: 80px;
     justify-content: space-between;
-  }
+}
 
-  .podium-item-2 {
+.podium-item-2 {
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -27,28 +27,35 @@
     border-radius: 10px;
     padding: 10px;
     width: 80px;
-  }
+}
 
-  .podium-top3 {
+.podium-top3 {
     display: flex;
     gap: 20px;
     flex-wrap: nowrap;
     align-items: flex-end
-  }
+}
   
-  .podium-avatar {
+.podium-avatar {
     width: 64px;
     height: 64px;
     margin-bottom: 10px;
-  }
+}
   
-  .podium-rank {
+.podium-rank {
     font-weight: bold;
     margin-top: 5px;
-  }
+}
   
-  .podium-name {
+.podium-name {
     margin-top: 5px;
     text-align: center;
-  }
-  
+}
+
+.teamranking{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(to bottom ,#F2E6EE, #977DFF);
+}

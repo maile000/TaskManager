@@ -14,10 +14,9 @@ function Login({ setUser }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     try {
       const res = await axios.post("http://localhost:5000/api/login", formData);
-      
+  
       if (res?.data?.user) {
         localStorage.setItem("token", res.data.token);
         localStorage.setItem("user", JSON.stringify(res.data.user));
@@ -29,8 +28,6 @@ function Login({ setUser }) {
       alert(error.response?.data?.error || "Login fehlgeschlagen");
     }
   };
-
-
 
   return (
     <div className="log-reg" style={{ backgroundImage: `url(${LogReg})` }}>

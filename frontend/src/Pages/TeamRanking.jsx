@@ -63,12 +63,12 @@ function TeamPage() {
   }
 
   return (
-    <div className="teampage">
+    <div className="teamranking">
         <Sidebar defaultOpen={false} />
         <div>
         {team.members && team.members.length > 0 ? (
             <div className="team-members">
-              <h2>Ranking</h2>
+              <h1>Ranking</h1>
               <div className="podium-list">
                 <div className="podium-top3">
                   {[...team.members]

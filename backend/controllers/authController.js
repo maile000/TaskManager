@@ -29,10 +29,10 @@ exports.register = async (req, res) => {
     await pool.query(
       `UPDATE users 
        SET last_login_date = CURRENT_DATE
-       WHERE id = $1`,
-      [newUser.rows[0].id]
+       WHERE id = $1 AND last_login_date < CURRENT_DATE`,
+      [user.rows[0].id]
     );
-
+    
     // Aktualisierten User mit Streak-Daten holen
     const updatedUser = await pool.query(
       `SELECT id, name, email, login_streak, total_points, level 
@@ -75,9 +75,10 @@ exports.login = async (req, res) => {
     await pool.query(
       `UPDATE users 
        SET last_login_date = CURRENT_DATE
-       WHERE id = $1`,
+       WHERE id = $1 AND last_login_date < CURRENT_DATE`,
       [user.rows[0].id]
     );
+    
 
     // 4. Aktualisierte User-Daten abrufen
     const updatedUser = await pool.query(

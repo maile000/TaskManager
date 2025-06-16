@@ -122,7 +122,19 @@
     color: #f2e6ee;
 }
 
-@media screen and (max-width: 767px) {
+.webp-icon {
+    width: auto;
+    height: 70%;
+    object-fit: contain;
+    pointer-events: none;
+}  
+
+@media screen and (max-width: 1000px) {
+ .landing-block2-header{
+    font-size: 150px;
+ }
+}
+@media screen and (max-width: 800px) {
     .header-welcome {
         font-size: 25px;
         line-height: normal;

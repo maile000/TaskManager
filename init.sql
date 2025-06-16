@@ -2,6 +2,7 @@ CREATE TABLE users (
   id BIGSERIAL PRIMARY KEY,
   name VARCHAR(50) NOT NULL UNIQUE,
   email VARCHAR(255) NOT NULL UNIQUE,
+  password_hash TEXT NOT NULL,
   created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW(),
   last_login_date DATE NOT NULL DEFAULT CURRENT_DATE,
   login_streak INTEGER NOT NULL DEFAULT 1,
@@ -110,7 +111,7 @@ DECLARE
   lvl_row level_thresholds%ROWTYPE;
   earned_points INTEGER;
 BEGIN
-  IF NEW.last_login_date = yesterday THEN
+  IF OLD.last_login_date = CURRENT_DATE - INTERVAL '1 day' THEN
     NEW.login_streak := OLD.login_streak + 1;
   ELSE
     NEW.login_streak := 1;

@@ -1,12 +1,15 @@
 import React, { useState, useRef, useEffect } from 'react';
 import "./Style/Landing.css";
 import KreuzWort from "../Assets/KreuzWort.svg";
-import Laptop from "../Assets/laptop.png";
+import Laptop from "../Assets/laptop.jpg";
+import Pin from "../Assets/pin.webp";
+import Hand from "../Assets/hand.webp";
+import Rakete from "../Assets/rakete.webp";
 
 const buttonData = [
-    { label: 'Projektarbeit', activeLabel: 'Behalte alle Projekte im Blick – ohne Multitasking-Wahnsinn. '},
-    { label: 'Option 2', activeLabel: 'Prüfungen, Hausarbeiten, Nebenjob – organisiert durchs Chaos.' },
-    { label: 'Option 3', activeLabel: 'Analysiere deine Produktivität & belohne dich. Motivation made easy.' },
+    { label: Pin , activeLabel: 'Behalte alle Projekte im Blick – ohne Multitasking-Wahnsinn. '},
+    { label: Hand, activeLabel: 'Prüfungen, Hausarbeiten, Nebenjob – organisiert durchs Chaos.' },
+    { label: Rakete, activeLabel: 'Analysiere deine Produktivität & belohne dich. Motivation made easy.' },
   ];
 
 
@@ -54,16 +57,10 @@ function Landing () {
 
     return (
         <div className="landing">
-            <div className="landing-block1">               
-                    <img src={KreuzWort} className="landing-img"/>
-                <div className='column header-welcome'>
-                  <h1>Willkommen </h1>
-                  <h1>zu deinem Task-Manager</h1>
-                </div>
-            </div>
+
             <div className='landing-block2'>
               <div className='landing-block2-img' style={{ backgroundImage: `url(${Laptop}) `}}>
-                <h1 className='landing-block2-header'>TASK</h1>
+                <h1 className='landing-block2-header'> TASK <br/> MANAGER</h1>
               </div> 
             </div>
             <div className="landing-block3 fade-in"
@@ -79,7 +76,11 @@ function Landing () {
                     `}
                     onClick={() => handleClick(index)}
                     >
-                    {activeButton === index ? btn.activeLabel : btn.label}
+                    {activeButton === index ? (
+                      <span>{btn.activeLabel}</span>
+                    ) : (
+                      <img src={btn.label} alt={`Icon ${index}`} className="webp-icon" />
+                    )}
                     </button>
                 ))}
             </div>
