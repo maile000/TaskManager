@@ -62,3 +62,59 @@ exports.getLevelProgress = async (req, res) => {
     res.status(500).json({ error: "Interner Serverfehler" });
   }
 };
+
+exports.getTeamLevels = async (req, res) => {
+  const pool = req.app.locals.pool;
+  const teamId = req.params.teamId;
+  const userId = req.userId; // Authentifizierter User
+
+  try {
+    // 1) Überprüfen, ob der User Mitglied des Teams ist
+    const membershipCheck = await pool.query(
+      `SELECT 1 FROM team_members WHERE team_id = $1 AND user_id = $2`,
+      [teamId, userId]
+    );
+
+    if (membershipCheck.rows.length === 0) {
+      return res.status(403).json({ error: "Kein Zugriff auf dieses Team" });
+    }
+
+    // 2) Alle Teammitglieder abrufen
+    const membersRes = await pool.query(
+      `SELECT id, total_points FROM users 
+       WHERE id IN (
+         SELECT user_id FROM team_members 
+         WHERE team_id = $1
+       )`,
+      [teamId]
+    );
+
+    // 3) Level für jedes Mitglied berechnen
+    const levelsPromises = membersRes.rows.map(async (member) => {
+      const totalPoints = parseInt(member.total_points, 10);
+      
+      const levelRes = await pool.query(
+        `SELECT level, points_required
+         FROM level_thresholds
+         WHERE points_required <= $1
+         ORDER BY points_required DESC
+         LIMIT 1`,
+        [totalPoints]
+      );
+
+      const currThresh = levelRes.rows[0] || { level: 1, points_required: 0 };
+      return {
+        userId: member.id,
+        level: currThresh.level,
+        points: totalPoints
+      };
+    });
+
+    const levels = await Promise.all(levelsPromises);
+    
+    res.json(levels);
+  } catch (err) {
+    console.error("Fehler in getTeamLevels:", err);
+    res.status(500).json({ error: "Interner Serverfehler" });
+  }
+};
