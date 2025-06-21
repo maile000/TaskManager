@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "./StyleComp/LogReg.css";
-import LogReg from "./../Assets/black.jpg";
+import LogReg from "./../Assets/black.webp";
 
 function Login({ setUser }) {
   const [formData, setFormData] = useState({ email: "", password: "" });

@@ -100,6 +100,7 @@ function TeamPage() {
                   
                   {editMode && member.id !== currentUserId ? (
                     <select
+                    className="teammember-select"
                       value={roleChanges[member.id] || member.role}
                       onChange={(e) =>
                         setRoleChanges({ ...roleChanges, [member.id]: e.target.value })

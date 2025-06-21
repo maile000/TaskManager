@@ -34,11 +34,22 @@
     border: 1px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
     width: 150px;
-    height: 100px;
+    min-height: 100px;
+    height: 120px;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     color: #0033FF;
     padding: 5px;
+}
+
+.teammitglied-card:hover{
+    transform: scale(1.2);
+}
+
+.teammember-select{
+    padding: 5px;
+    margin: 5px;
+    border-radius: 5px;
 }

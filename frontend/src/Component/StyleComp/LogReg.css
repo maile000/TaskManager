@@ -2,8 +2,12 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-    width: 100vw;
+    min-height: 100vh;
+  width: 100vw;
+  background-size: cover; 
+  background-position: center; 
+  background-repeat: no-repeat;
+  background-attachment: fixed; 
 }
 
 .log-block{
