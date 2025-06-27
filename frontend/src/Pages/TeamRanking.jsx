@@ -82,7 +82,7 @@ function TeamPage() {
       <div>
         {team.members && team.members.length > 0 ? (
           <div className="team-members">
-            <h1>Ranking</h1>
+            <h1>Team Ranking</h1>
             <div className="podium-list">
               {/* Top 3 Mitglieder */}
               <div className="podium-top3">

@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./StyleComp/Modal.css";
 
-const CreatTaskModal = ({ onClose, onCreate }) => {
+const CreatTaskModal = ({ onClose, onCreate , refreshProjects}) => {
   const { teamId } = useParams();
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -63,6 +63,11 @@ const CreatTaskModal = ({ onClose, onCreate }) => {
       setSelectedProjectId(response.data.id);
       setNewProjectName("");
       setShowNewProjectInput(false);
+      
+      // Hier den Refresh auslösen
+      if (refreshProjects) {
+        refreshProjects();
+      }
     } catch (error) {
       console.error("Fehler beim Erstellen des Projekts:", error);
     }

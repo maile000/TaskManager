@@ -31,7 +31,12 @@ function TaskCard({ task, onTaskClick , activeTaskId}) {
         onClick={() => onTaskClick && onTaskClick(task)}
         style={{ width: "100%", textAlign: "center", padding: "10px" }}
       >
-        <strong style={{ color: "#F2E6EE" }}>{task.title}</strong>
+        <strong style={{ 
+          color: "#F2E6EE", 
+          ":hover": {
+            color: "#0033FF" 
+          }
+        }}>{task.title}</strong>
       </div>
     </div>
   );

@@ -30,7 +30,7 @@ exports.register = async (req, res) => {
       `UPDATE users 
        SET last_login_date = CURRENT_DATE
        WHERE id = $1 AND last_login_date < CURRENT_DATE`,
-      [user.rows[0].id]
+      [newUser.rows[0].id]
     );
     
     // Aktualisierten User mit Streak-Daten holen

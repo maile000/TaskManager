@@ -37,6 +37,7 @@ function Board() {
   const [isOpen, setIsOpen] = useState(false);
   const toggle = () => setIsOpen(o => !o);
   const [refreshTrigger, setRefreshTrigger] = useState(0);
+  const [projectRefreshTrigger, setProjectRefreshTrigger] = useState(0);
 
 useEffect(() => {
   setPriorities([
@@ -52,6 +53,22 @@ useEffect(() => {
     setFilters(prev => ({ ...prev, [filterName]: value }));
     fetchTasks();
   };
+
+  useEffect(() => {
+    if (!teamId) return;
+    const loadProjects = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(`http://localhost:5000/api/teams/${teamId}/projects`,{ 
+          headers: { Authorization: `Bearer ${token}` } 
+        });
+        setProjects(response.data);
+      } catch (err) {
+        console.error("Fehler beim Laden der Projekte:", err);
+      }
+    };
+    loadProjects();
+  }, [teamId, projectRefreshTrigger]);
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -230,7 +247,11 @@ const handleDragEnd = async (event) => {
               Task erstellen
             </button>
             {isCreateTaskOpen && (
-                <AddTask onClose={() => setCreateTaskOpen(false)} onCreate={handleCreateTask} />
+                <AddTask 
+                onClose={() => setCreateTaskOpen(false)} 
+                onCreate={handleCreateTask} 
+                refreshProjects={() => setProjectRefreshTrigger(prev => prev + 1)}
+                />
             )}
               <div className="collapsible-wrapper">
                 <button className="toggle-btn" onClick={toggle}>
@@ -273,7 +294,7 @@ const handleDragEnd = async (event) => {
                     onChange={e => handleFilterChange("priority_flag", e.target.value)}
                     className="filter-select"
                   >
-                    <option value="">Alle Flags</option>
+                    <option value="">Alle Prioritäten</option>
                       {priorities.map(prio => (
                           <option key={prio.value} value={prio.value}>
                             {prio.label}

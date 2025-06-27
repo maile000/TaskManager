@@ -87,7 +87,7 @@ function Landing () {
             <div className="landing-block-text fade-in"
             ref={(el) => (sectionRefs.current[3] = el)} >
               <h1>
-                Mit denem Task Managers behältst du endlich den Überblick über deine Aufgaben, Projekte und Ziele – ohne Chaos, verpasste Deadlines oder überfüllte To-Do-Listen.
+                Mit denem Task Manager behältst du endlich den Überblick über deine Aufgaben, Projekte und Ziele – ohne Chaos, verpasste Deadlines oder überfüllte To-Do-Listen.
               </h1> 
           </div>
         </div>
