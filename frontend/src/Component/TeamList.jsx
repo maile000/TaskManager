@@ -3,6 +3,7 @@ import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import CreateTeamModal from "../Component/CreatTeamModal";
 
+
 const TeamList = ({ teams, setTeams }) => {
   const navigate = useNavigate();
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

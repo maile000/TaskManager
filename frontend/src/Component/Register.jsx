@@ -2,7 +2,7 @@ import { useState } from "react";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 import "./StyleComp/LogReg.css";
-import LogReg from "./../Assets/black.webp";
+import LogReg from "./../Assets/glas1.png";
 
 
 function Register({ setUser }) {

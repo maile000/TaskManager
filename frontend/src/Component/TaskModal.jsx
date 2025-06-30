@@ -184,7 +184,6 @@ const TaskModal = forwardRef(({ isOpen, onClose, task, refreshTaskList, openComm
               <option value="To Do">To Do</option>
               <option value="In Progress">In Progress</option>
               <option value="Done">Done</option>
-              <option value="Archived">Archived</option>
             </select>
           ) : (
             <p>{status}</p>

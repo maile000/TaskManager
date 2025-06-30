@@ -66,7 +66,7 @@
 }
 
 .landing-block3-div:hover{
-    border: 3px solid #0033FF;
+    outline: 3px solid #0033FF;
 }
 
 .landing-block3-div.active {

@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import "./StyleComp/LogReg.css";
-import LogReg from "./../Assets/black.webp";
+import LogReg from "./../Assets/glas1.png";
 
 function Login({ setUser }) {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -53,7 +53,7 @@ function Login({ setUser }) {
             Login
           </button>
           <p>
-            Noch kein Account? <Link to="/register">hier anmelden</Link>.
+            Noch kein Account? <Link to="/register">Hier anmelden</Link>.
           </p>
         </form>
       </div>

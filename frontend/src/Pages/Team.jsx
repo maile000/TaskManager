@@ -31,9 +31,31 @@ function Team() {
     fetchTeams();
   }, [userId]);
 
+  const fetchTeams = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const response = await axios.get("http://localhost:5000/api/teams", {
+        params: { userId },
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setTeams(response.data);
+    } catch (error) {
+      console.error("Fehler beim Laden der Teams:", error);
+    }
+  };
+  
+
   const handleCreateTeam = (newTeam) => {
     setTeams([...teams, newTeam]);
   }
+
+  const handleJoinTeam = () => {
+    fetchTeams(); 
+    setIsJoinModalOpen(false);
+  };
+
   return (
     <div className="team-managment-page" style={{ backgroundImage: `url(${GlasBackground}) ` }}>
       <div style={{margin:"80px"}}>
@@ -56,9 +78,8 @@ function Team() {
         {isJoinModalOpen && (
           <JoinTeamModal
             onClose={() => setIsJoinModalOpen(false)}
-            onJoin={() => {
-              setIsJoinModalOpen(false);              
-            }}
+            onJoin={handleJoinTeam}              
+            
           />
         )}
       </div>

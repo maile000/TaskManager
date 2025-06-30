@@ -1,7 +1,7 @@
 import React from "react";
 import "./StyleComp/Modal.css";
 
-const InviteModal = ({ inviteCode, onClose }) => {
+const InviteModal = ({ inviteCode, onClose}) => {
   return (
     <div className="modalOverlay">
       <div className="modalContent">

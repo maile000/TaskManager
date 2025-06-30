@@ -69,6 +69,7 @@
 .column-body{ 
     flex: 1;
     overflow-y: auto;
+    height: 95%;
 }
 
 .task-card{

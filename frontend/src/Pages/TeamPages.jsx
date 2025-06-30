@@ -13,8 +13,41 @@ function TeamPage() {
   const [isInviteModalOpen, setIsInviteModalOpen] = useState(false);
   const [editMode, setEditMode] = useState(false);
   const [roleChanges, setRoleChanges] = useState({});
-  const currentUserId = useMemo(() => JSON.parse(atob(localStorage.getItem("token").split(".")[1])).id, []);
+  
+  const currentUserId = useMemo(() => {
+    const token = localStorage.getItem("token");
+    if (!token) return null;
+  
+    try {
+      const base64Url = token.split(".")[1];
+      const base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/");
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split("")
+          .map(c => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+          .join("")
+      );
+      const payload = JSON.parse(jsonPayload);
+      console.log("🧾 JWT Payload:", payload);
+  
+      const userId = payload.userId; // ← HIER liegt dein Key
+      console.log("✅ Extracted User ID:", userId);
+  
+      return Number(userId);
+    } catch (err) {
+      console.error("❌ Fehler beim Dekodieren des Tokens:", err);
+      return null;
+    }
+  }, []);
+  
+  // Get current user's role in this team
+  const currentUserRole = useMemo(() => {
+    if (!team || !team.members) return null;
+    const currentMember = team.members.find(member => member.id === Number(currentUserId));
+    return currentMember?.role;
+  }, [team, currentUserId]);
 
+  const isTeamLead = currentUserRole === "Team Lead";
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -66,64 +99,73 @@ function TeamPage() {
     return <div>Lade Team...</div>;
   }
 
+  console.log("Current User ID:", currentUserId, typeof currentUserId);
+  console.log("Team Member IDs:", team.members.map(m => [m.name, m.id, typeof m.id]));
+  console.log("Current User Role:", currentUserRole);
+  
+  
   return (
     <div className="teampage" style={{ backgroundImage: `url(${GlasBackground}) ` }}>
       <Sidebar />
       <div className="column team-uebersicht-div">
         <h1>{team.name}</h1>
        
-        <div>
-          <button className="button" onClick={() => setIsInviteModalOpen(true)}>
-            Mitglieder hinzufügen
-          </button>
-          {isInviteModalOpen && (
-            <InviteModal
-              inviteCode={team.invite_code}
-              onClose={() => setIsInviteModalOpen(false)}
-            />
-          )}
-        </div>
+        {isTeamLead && (
+          <div>
+            <button className="button" onClick={() => setIsInviteModalOpen(true)}>
+              Mitglieder hinzufügen
+            </button>
+            {isInviteModalOpen && (
+              <InviteModal
+                inviteCode={team.invite_code}
+                onClose={() => setIsInviteModalOpen(false)}
+              />
+            )}
+          </div>
+        )}
        
         <div>
           {team.members && team.members.length > 0 ? (
             <div className="team-members">
               <h2>Teammitglieder</h2>
               <div className="teammitglied-list">
-              {team.members.map((member) => (
-                <div key={member.id} className="teammitglied-card">
-                  <div
-                    className="avatar"
-                    dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
-                    style={{ width: "64px", height: "64px" }}
-                  />
-                  <div><strong>{member.name}</strong></div>
-                  
-                  {editMode && member.id !== currentUserId ? (
-                    <select
-                    className="teammember-select"
-                      value={roleChanges[member.id] || member.role}
-                      onChange={(e) =>
-                        setRoleChanges({ ...roleChanges, [member.id]: e.target.value })
-                      }
-                    >
-                      <option value="Member">Member</option>
-                      <option value="Team Lead">Team Lead</option>
-                    </select>
-                  ) : (
-                    <div>{member.role}</div>
-                  )}
-                </div>
-              ))}
+                {team.members.map((member) => (
+                  <div key={member.id} className="teammitglied-card">
+                    <div
+                      className="avatar"
+                      dangerouslySetInnerHTML={{ __html: avatars[member.id] || "" }}
+                      style={{ width: "64px", height: "64px" }}
+                    />
+                    <div><strong>{member.name}</strong></div>
+                    
+                    {editMode && member.id !== currentUserId ? (
+                      <select
+                        className="teammember-select"
+                        value={roleChanges[member.id] || member.role}
+                        onChange={(e) =>
+                          setRoleChanges({ ...roleChanges, [member.id]: e.target.value })
+                        }
+                      >
+                        <option value="Member">Member</option>
+                        <option value="Team Lead">Team Lead</option>
+                      </select>
+                    ) : (
+                      <div>{member.role}</div>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           ) : (
             <p>Keine Mitglieder gefunden.</p>
           )}
         </div>
-        <div>
-          <button className="secondary-button" onClick={() => setEditMode(!editMode)}>
-            {editMode ? "Abbrechen" : "Rollen bearbeiten"}
-          </button>
+        
+        {isTeamLead && (
+          <div>
+            <button className="secondary-button" onClick={() => setEditMode(!editMode)}>
+              {editMode ? "Abbrechen" : "Rollen bearbeiten"}
+            </button>
             {editMode && (
               <button
                 className="button"
@@ -151,7 +193,8 @@ function TeamPage() {
                 Speichern
               </button>
             )}
-        </div>
+          </div>
+        )}
       </div>
     </div>
   );
