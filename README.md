@@ -1,7 +1,12 @@
 # Gamified Task Manager
 
 ## 📌 Über das Projekt
-Web-App zur Verbesserung der Teamfähigkeit digitaler Gruppen durch Gamification-Elemente, entwickelt im Rahmen der Bachelorarbeit 
+Web-App zur Verbesserung der Teamfähigkeit digitaler Gruppen durch Gamification-Elemente, entwickelt im Rahmen der Bachelorarbeit.
+
+Das Projekt ist eine Webanwendung und zugleich ein spielerischer Kanban-Task-Manager, der die Zusammenarbeit im Team motivierend gestaltet.
+Erstelle dein eigenes Team oder trete einem bestehenden bei, um gemeinsam Aufgaben zu organisieren und abzuarbeiten – ganz im klassischen Kanban-Stil.
+
+Innerhalb deines Teams siehst du jederzeit, wer gerade vorne liegt, und kannst dich mit deinen Teammitgliedern  messen. So wird Teamarbeit nicht nur effizient, sondern auch ein  zum Spiel.
 
 ### Features
 - **Level-System** – Steige auf & sammle Punkte für erledigte Tasks  
